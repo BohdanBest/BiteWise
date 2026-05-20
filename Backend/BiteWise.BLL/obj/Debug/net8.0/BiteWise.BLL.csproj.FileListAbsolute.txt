@@ -1,0 +1,15 @@
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/bin/Debug/net8.0/BiteWise.BLL.deps.json
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/bin/Debug/net8.0/BiteWise.BLL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/bin/Debug/net8.0/BiteWise.BLL.pdb
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/bin/Debug/net8.0/BiteWise.DAL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/bin/Debug/net8.0/BiteWise.DAL.pdb
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.csproj.AssemblyReference.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.GeneratedMSBuildEditorConfig.editorconfig
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.AssemblyInfoInputs.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.AssemblyInfo.cs
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.csproj.CoreCompileInputs.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.34D1DAA0.Up2Date
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/refint/BiteWise.BLL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.pdb
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/ref/BiteWise.BLL.dll

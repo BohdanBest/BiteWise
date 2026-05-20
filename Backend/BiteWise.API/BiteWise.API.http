@@ -1,0 +1,6 @@
+@BiteWise.API_HostAddress = http://localhost:5138
+
+GET {{BiteWise.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

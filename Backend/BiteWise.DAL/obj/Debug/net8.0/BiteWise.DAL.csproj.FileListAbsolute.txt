@@ -1,0 +1,14 @@
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/bin/Debug/net8.0/BiteWise.DAL.deps.json
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/bin/Debug/net8.0/BiteWise.DAL.runtimeconfig.json
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/bin/Debug/net8.0/BiteWise.DAL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/bin/Debug/net8.0/BiteWise.DAL.pdb
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.csproj.AssemblyReference.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.GeneratedMSBuildEditorConfig.editorconfig
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.AssemblyInfoInputs.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.AssemblyInfo.cs
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.csproj.CoreCompileInputs.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/refint/BiteWise.DAL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.pdb
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.genruntimeconfig.cache
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/ref/BiteWise.DAL.dll
