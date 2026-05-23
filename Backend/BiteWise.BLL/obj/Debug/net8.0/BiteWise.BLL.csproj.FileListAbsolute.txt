@@ -13,3 +13,4 @@
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/refint/BiteWise.BLL.dll
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.pdb
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/ref/BiteWise.BLL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL/obj/Debug/net8.0/BiteWise.BLL.sourcelink.json

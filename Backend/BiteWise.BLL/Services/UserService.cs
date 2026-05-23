@@ -10,10 +10,12 @@ namespace BiteWise.BLL.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly AutoMapper.IMapper _mapper;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, AutoMapper.IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         public async Task<UserProfileDto> GetProfileAsync(Guid userId)
@@ -24,25 +26,7 @@ namespace BiteWise.BLL.Services
                 throw new Exception("Користувача не знайдено.");
             }
 
-            string goalName = user.Goal switch
-            {
-                Goal.LoseWeight => "Схуднення",
-                Goal.MaintainWeight => "Підтримка ваги",
-                Goal.GainWeight => "Набір маси",
-                _ => "Невідомо"
-            };
-
-            return new UserProfileDto
-            {
-                Name = user.Name,
-                Email = user.Email,
-                Age = user.Age,
-                WeightKg = user.WeightKg,
-                HeightCm = user.HeightCm,
-                GoalName = goalName,
-                DailyCalorieGoal = user.DailyCalorieGoal,
-                FormulaDetails = "ФОРМУЛА ХАРРІСА-БЕНЕДИКТА · КОЕФ. 1.2"
-            };
+            return _mapper.Map<UserProfileDto>(user);
         }
         public async Task<UserProfileDto> UpdateProfileAsync(Guid userId, UpdateProfileDto dto)
         {

@@ -12,3 +12,4 @@
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.pdb
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.genruntimeconfig.cache
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/ref/BiteWise.DAL.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.DAL/obj/Debug/net8.0/BiteWise.DAL.sourcelink.json

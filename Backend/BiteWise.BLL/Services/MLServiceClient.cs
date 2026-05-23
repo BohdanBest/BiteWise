@@ -8,8 +8,11 @@ using Microsoft.Extensions.Configuration;
 using BiteWise.BLL.DTOs.Scan;
 using BiteWise.BLL.Interfaces;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace BiteWise.BLL.Services
 {
+    [ExcludeFromCodeCoverage]
     public class MLServiceClient : IMLServiceClient
     {
         private readonly HttpClient _httpClient;

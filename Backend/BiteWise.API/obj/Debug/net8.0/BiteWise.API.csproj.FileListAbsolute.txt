@@ -130,3 +130,8 @@
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/Pipelines.Sockets.Unofficial.dll
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/StackExchange.Redis.dll
 /Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/System.Diagnostics.DiagnosticSource.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/obj/Debug/net8.0/BiteWise.API.sourcelink.json
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/AutoMapper.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/FluentValidation.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/FluentValidation.AspNetCore.dll
+/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API/bin/Debug/net8.0/FluentValidation.DependencyInjectionExtensions.dll

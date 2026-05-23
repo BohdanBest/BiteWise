@@ -12,11 +12,13 @@ namespace BiteWise.BLL.Services
     {
         private readonly IFoodEntryRepository _foodEntryRepository;
         private readonly IUserRepository _userRepository;
+        private readonly AutoMapper.IMapper _mapper;
 
-        public DiaryService(IFoodEntryRepository foodEntryRepository, IUserRepository userRepository)
+        public DiaryService(IFoodEntryRepository foodEntryRepository, IUserRepository userRepository, AutoMapper.IMapper mapper)
         {
             _foodEntryRepository = foodEntryRepository;
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         public async Task<FoodEntryResponseDto> AddEntryAsync(Guid userId, AddFoodEntryDto dto)
@@ -43,18 +45,7 @@ namespace BiteWise.BLL.Services
             await _foodEntryRepository.AddAsync(entry);
             await _foodEntryRepository.SaveChangesAsync();
 
-            return new FoodEntryResponseDto
-            {
-                Id = entry.Id,
-                FoodName = entry.FoodName,
-                Calories = entry.Calories,
-                Proteins = entry.Proteins,
-                Fats = entry.Fats,
-                Carbs = entry.Carbs,
-                WeightGrams = entry.WeightGrams,
-                MealType = entry.MealType,
-                ConsumedAt = entry.ConsumedAt
-            };
+            return _mapper.Map<FoodEntryResponseDto>(entry);
         }
 
         public async Task<DailySummaryDto> GetDailySummaryAsync(Guid userId, DateTime date)
@@ -74,18 +65,7 @@ namespace BiteWise.BLL.Services
                 TotalProteins = entries.Sum(e => e.Proteins),
                 TotalFats = entries.Sum(e => e.Fats),
                 TotalCarbs = entries.Sum(e => e.Carbs),
-                Entries = entries.Select(e => new FoodEntryResponseDto
-                {
-                    Id = e.Id,
-                    FoodName = e.FoodName,
-                    Calories = e.Calories,
-                    Proteins = e.Proteins,
-                    Fats = e.Fats,
-                    Carbs = e.Carbs,
-                    WeightGrams = e.WeightGrams,
-                    MealType = e.MealType,
-                    ConsumedAt = e.ConsumedAt
-                }).ToList()
+                Entries = _mapper.Map<System.Collections.Generic.List<FoodEntryResponseDto>>(entries)
             };
 
             summary.RemainingCalories = summary.DailyCalorieGoal - summary.TotalCaloriesConsumed;

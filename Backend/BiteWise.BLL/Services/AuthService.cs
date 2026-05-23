@@ -14,11 +14,13 @@ namespace BiteWise.BLL.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly AutoMapper.IMapper _mapper;
 
-        public AuthService(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator)
+        public AuthService(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator, AutoMapper.IMapper mapper)
         {
             _userRepository = userRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
+            _mapper = mapper;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -44,20 +46,11 @@ namespace BiteWise.BLL.Services
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             string refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
 
-            var user = new User
-            {
-                Email = dto.Email,
-                Name = dto.Name,
-                PasswordHash = passwordHash,
-                Gender = dto.Gender,
-                Age = dto.Age,
-                WeightKg = dto.WeightKg,
-                HeightCm = dto.HeightCm,
-                Goal = dto.Goal,
-                DailyCalorieGoal = (int)Math.Round(dailyCalories),
-                RefreshToken = refreshToken,
-                RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-            };
+            var user = _mapper.Map<User>(dto);
+            user.PasswordHash = passwordHash;
+            user.DailyCalorieGoal = (int)Math.Round(dailyCalories);
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();

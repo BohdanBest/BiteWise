@@ -11,8 +11,11 @@ using BiteWise.BLL.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace BiteWise.BLL.Services
 {
+    [ExcludeFromCodeCoverage]
     public class NutritionService : INutritionService
     {
         private readonly IFatSecretAuthService _authService;

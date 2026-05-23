@@ -4,7 +4,12 @@ using BiteWise.BLL.Services;
 using BiteWise.DAL.Context;
 using BiteWise.DAL.Interfaces;
 using BiteWise.DAL.Repositories;
+using BiteWise.API.Filters;
+using BiteWise.BLL.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -13,8 +18,17 @@ DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Додаємо контролери
-builder.Services.AddControllers();
+// 1. Додаємо контролери та фільтри
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
+
+// Вимикаємо стандартну обробку помилок валідації, щоб працював наш фільтр
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 // 2. Підключаємо базу даних PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -42,6 +56,14 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IFatSecretAuthService, FatSecretAuthService>();
 builder.Services.AddHttpClient<INutritionService, NutritionService>();
 builder.Services.AddHttpClient<IMLServiceClient, MLServiceClient>();
+
+// Реєстрація AutoMapper та FluentValidation
+builder.Services.AddAutoMapper(cfg => 
+{
+    cfg.AddProfile<BiteWise.BLL.Mappings.MappingProfile>();
+});
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
 // 4. Налаштування JWT Авторизації
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -121,3 +143,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
