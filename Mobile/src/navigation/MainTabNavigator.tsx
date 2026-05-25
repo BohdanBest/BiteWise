@@ -132,8 +132,8 @@ const styles = StyleSheet.create({
   tabBar: {
     position: "absolute",
     bottom: 24,
-    left: 20,
-    right: 20,
+    left: 2,
+    right: 2,
     height: 72,
     backgroundColor: "transparent",
     elevation: 0,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   blurContainer: {
     flex: 1,
-    borderRadius: 60,
+    borderRadius: 20,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",

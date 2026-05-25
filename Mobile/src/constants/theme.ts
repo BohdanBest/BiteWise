@@ -19,44 +19,48 @@ export const Theme = {
   },
   typography: {
     displayXl: {
-      fontFamily: 'SpaceGrotesk_700Bold',
+      fontFamily: 'System',
+      fontWeight: 'bold' as const,
       fontSize: 48,
       letterSpacing: -1,
     },
     h1: {
-      fontFamily: 'SpaceGrotesk_700Bold',
+      fontFamily: 'System',
+      fontWeight: 'bold' as const,
       fontSize: 30,
     },
     h2: {
-      fontFamily: 'SpaceGrotesk_600SemiBold',
+      fontFamily: 'System',
+      fontWeight: '600' as const,
       fontSize: 24,
     },
     h3: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'System',
+      fontWeight: '600' as const,
       fontSize: 20,
     },
     bodyL: {
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'System',
       fontSize: 16,
     },
     body: {
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'System',
       fontSize: 14,
     },
     caption: {
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'System',
       fontSize: 12,
       color: 'hsl(150, 8%, 50%)',
     },
     overline: {
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'System',
       fontSize: 12,
       textTransform: 'uppercase' as const,
       letterSpacing: 2,
     },
     tabularNums: {
-      fontFamily: 'SpaceGrotesk_700Bold',
-      // fontVariant: ['tabular-nums'], // causes clipping on Android
+      fontFamily: 'System',
+      fontWeight: 'bold' as const,
     }
   },
   spacing: {

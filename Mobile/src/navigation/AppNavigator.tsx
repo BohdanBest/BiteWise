@@ -10,6 +10,7 @@ import OnboardingMetricsScreen from '../screens/Onboarding/OnboardingMetricsScre
 import OnboardingGoalScreen from '../screens/Onboarding/OnboardingGoalScreen';
 import OnboardingResultScreen from '../screens/Onboarding/OnboardingResultScreen';
 import MainTabNavigator from './MainTabNavigator';
+import SettingsScreen from '../screens/Main/SettingsScreen';
 import SplashScreen from '../screens/Splash/SplashScreen';
 import useAuthStore from '../store/useAuthStore';
 
@@ -42,6 +43,7 @@ export default function AppNavigator() {
             // Екрани для авторизованого користувача
             <>
               <Stack.Screen name="Main" component={MainTabNavigator} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
             </>
           )}
         </Stack.Navigator>

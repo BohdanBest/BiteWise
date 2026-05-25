@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BiteWise.BLL.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e89fd8da73be236e4d09f61aeb4f21bd98d3f86b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be13ae433ff3cf36c8dd616f29d24f3b7fbd2278")]
 [assembly: System.Reflection.AssemblyProductAttribute("BiteWise.BLL.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BiteWise.BLL.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

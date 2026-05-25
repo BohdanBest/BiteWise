@@ -14,6 +14,7 @@ import {
   Plus,
   Sparkles,
   Sun,
+  Sunrise,
 } from "lucide-react-native";
 import { Theme } from "../../constants/theme";
 import CircularProgress from "../../components/ui/CircularProgress";
@@ -134,7 +135,11 @@ export default function HomeScreen() {
         <View style={styles.mealCard}>
           <View style={styles.mealCardHeader}>
             <View style={styles.mealTitleRow}>
-              <Text style={styles.mealEmoji}>🌅</Text>
+              <Sunrise
+                size={20}
+                color={Theme.colors.warning}
+                style={{ marginRight: 12 }}
+              />
               <Text style={styles.mealTitle}>Сніданок</Text>
             </View>
             <View style={styles.mealCaloriesBadge}>
@@ -365,10 +370,6 @@ const styles = StyleSheet.create({
   mealTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  mealEmoji: {
-    fontSize: 20,
-    marginRight: 12,
   },
   mealTitle: {
     fontFamily: Theme.typography.h3.fontFamily,
