@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  Alert,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -125,19 +126,40 @@ export default function DiaryScreen() {
                 });
 
                 return (
-                  <TouchableOpacity
-                    style={[styles.deleteAction, isLast && { marginBottom: 0 }]}
-                    onPress={() => {
-                      const ref = swipeableRefs.current.get(item.id);
-                      if (ref) ref.close();
-                      deleteFoodItem(item.id);
-                    }}
-                    activeOpacity={0.8}
-                  >
+                  <View style={{ width: 60, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
                     <Animated.View style={[{ transform: [{ scale }] }]}>
-                      <Trash2 size={20} color="#FFF" />
+                      <TouchableOpacity
+                        style={styles.deleteAction}
+                        onPress={() => {
+                          const ref = swipeableRefs.current.get(item.id);
+                          Alert.alert(
+                            "Видалити запис?",
+                            `Ви впевнені, що хочете видалити "${item.foodName}"?`,
+                            [
+                              {
+                                text: "Скасувати",
+                                style: "cancel",
+                                onPress: () => {
+                                  if (ref) ref.close();
+                                }
+                              },
+                              {
+                                text: "Видалити",
+                                style: "destructive",
+                                onPress: () => {
+                                  if (ref) ref.close();
+                                  deleteFoodItem(item.id);
+                                }
+                              }
+                            ]
+                          );
+                        }}
+                        activeOpacity={0.8}
+                      >
+                        <Trash2 size={20} color="#FFF" />
+                      </TouchableOpacity>
                     </Animated.View>
-                  </TouchableOpacity>
+                  </View>
                 );
               };
 
@@ -152,9 +174,9 @@ export default function DiaryScreen() {
                   friction={2}
                   rightThreshold={40}
                   overshootRight={false}
-                  containerStyle={isLast ? { borderBottomWidth: 0, paddingBottom: 0, marginBottom: 0 } : {}}
+                  containerStyle={isLast ? {} : { marginBottom: 12 }}
                 >
-                  <View style={[styles.mealItemCard, isLast && { borderBottomWidth: 0, paddingBottom: 0, marginBottom: 0 }]}>
+                  <View style={[styles.mealItemCard, isLast && { borderBottomWidth: 0 }]}>
                     <View>
                       <Text style={styles.foodName}>{item.foodName}</Text>
                       <Text style={styles.foodDetails}>{item.weightGrams}г · {item.calories} ккал</Text>
@@ -338,7 +360,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     paddingBottom: theme.spacing.m,
-    marginBottom: theme.spacing.m,
   },
   foodName: {
     ...theme.typography.body,
@@ -384,8 +405,5 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    marginLeft: 16,
-    alignSelf: 'center',
-    marginBottom: 16, // Щоб вирівняти з урахуванням відступів карток
   },
 });

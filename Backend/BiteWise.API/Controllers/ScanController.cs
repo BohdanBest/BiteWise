@@ -15,11 +15,13 @@ namespace BiteWise.API.Controllers
     {
         private readonly IMLServiceClient _mlServiceClient;
         private readonly INutritionService _nutritionService;
+        private readonly IBarcodeService _barcodeService;
 
-        public ScanController(IMLServiceClient mlServiceClient, INutritionService nutritionService)
+        public ScanController(IMLServiceClient mlServiceClient, INutritionService nutritionService, IBarcodeService barcodeService)
         {
             _mlServiceClient = mlServiceClient;
             _nutritionService = nutritionService;
+            _barcodeService = barcodeService;
         }
 
         [HttpPost]
@@ -57,10 +59,10 @@ namespace BiteWise.API.Controllers
                 {
                     FoodName = nutrition.LocalizedName,
                     WeightGrams = mlResult.EstimatedWeightGrams,
-                    Calories = nutrition.CaloriesPer100g,
-                    Proteins = nutrition.ProteinsPer100g,
-                    Fats = nutrition.FatsPer100g,
-                    Carbs = nutrition.CarbsPer100g,
+                    Calories = (int)(nutrition.CaloriesPer100g * weightMultiplier),
+                    Proteins = nutrition.ProteinsPer100g * weightMultiplier,
+                    Fats = nutrition.FatsPer100g * weightMultiplier,
+                    Carbs = nutrition.CarbsPer100g * weightMultiplier,
                     Confidence = mlResult.Confidence,
                     Warning = mlResult.Warning
                 };
@@ -82,6 +84,26 @@ namespace BiteWise.API.Controllers
                 }
 
                 return Ok(finalResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Помилка сервера: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("barcode/{barcode}")]
+        public async Task<IActionResult> ScanBarcode(string barcode)
+        {
+            try
+            {
+                var result = await _barcodeService.GetProductByBarcodeAsync(barcode);
+                
+                if (result == null)
+                {
+                    return NotFound(new { message = "Продукт не знайдено в базі даних штрихкодів." });
+                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {

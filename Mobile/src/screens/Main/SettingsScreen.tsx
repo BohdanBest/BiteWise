@@ -283,6 +283,8 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 0,
     paddingTop: theme.spacing.m,
     paddingBottom: theme.spacing.l,
@@ -296,7 +298,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderColor: theme.colors.border,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: theme.spacing.l,
+    marginRight: theme.spacing.m,
   },
   headerTitle: {
     fontFamily: theme.typography.h1.fontFamily,

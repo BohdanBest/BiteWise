@@ -18,6 +18,7 @@ import {
   Target,
   Settings,
   LogOut,
+  Award,
 } from "lucide-react-native";
 import { Theme } from "../../constants/theme";
 import { useTheme, useStyles } from "../../hooks/useTheme";
@@ -127,6 +128,15 @@ export default function ProfileScreen() {
         </View>
 
         {/* Action Buttons */}
+        <TouchableOpacity 
+          style={styles.actionCard} 
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('Achievements')}
+        >
+          <Award size={20} color={theme.colors.primary} />
+          <Text style={styles.actionText}>Мої досягнення</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity 
           style={styles.actionCard} 
           activeOpacity={0.7}

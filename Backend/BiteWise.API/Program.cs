@@ -68,7 +68,9 @@ builder.Services.AddScoped<IDiaryService, DiaryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpClient<IFatSecretAuthService, FatSecretAuthService>();
-builder.Services.AddHttpClient<INutritionService, NutritionService>();
+builder.Services.AddScoped<INutritionService, NutritionService>();
+builder.Services.AddScoped<IAchievementService, AchievementService>();
+builder.Services.AddScoped<IBarcodeService, BarcodeService>();
 builder.Services.AddHttpClient<IMLServiceClient, MLServiceClient>();
 
 // Реєстрація AutoMapper та FluentValidation

@@ -170,49 +170,41 @@ export default function ScanScreen() {
     setStep('loading');
     
     try {
-      const response = await axios.get(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-      
-      if (response.data.status === 1 && response.data.product) {
-        const product = response.data.product;
-        const nutriments = product.nutriments || {};
-        
-        let kcal = nutriments['energy-kcal_100g'];
-        let warningText;
-        
-        if (kcal === undefined || kcal === null) {
-          if (nutriments['energy_100g']) {
-            // Перевід кДж у ккал
-            kcal = nutriments['energy_100g'] / 4.184;
-          } else {
-            kcal = 0;
-            warningText = "У базі відсутня інформація про калорії. Встановлено 0 ккал.";
-          }
+      const apiUrl = `http://192.168.31.149:5138/api/Scan/barcode/${barcode}`;
+      const response = await axios.get(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-        
-        const newResult = {
-          food: {
-            id: 'barcode-main',
-            nameUa: product.product_name || 'Невідомий продукт',
-            calories: Math.round(kcal),
-            protein: Math.round(nutriments['proteins_100g'] || 0),
-            fat: Math.round(nutriments['fat_100g'] || 0),
-            carbs: Math.round(nutriments['carbohydrates_100g'] || 0),
-          },
-          confidence: 100,
-          warning: warningText
-        };
-        
-        setScanResults([newResult]);
-        setWeight(product.product_quantity ? product.product_quantity.toString() : '100');
-        setSelectedIndex(0);
-        setStep('result');
-      } else {
-        Alert.alert('Помилка', 'Продукт не знайдено в базі даних штрихкодів.');
-        setStep('capture');
-      }
-    } catch (error) {
+      });
+      
+      const data: ScanResultDto = response.data;
+      
+      const newResult = {
+        food: {
+          id: 'barcode-main',
+          nameUa: data.foodName,
+          calories: data.calories,
+          protein: data.proteins,
+          fat: data.fats,
+          carbs: data.carbs,
+        },
+        confidence: data.confidence,
+        warning: data.warning
+      };
+      
+      setScanResults([newResult]);
+      setWeight(data.weightGrams ? data.weightGrams.toString() : '100');
+      setSelectedIndex(0);
+      setStep('result');
+    } catch (error: any) {
       console.error(error);
-      Alert.alert('Помилка', 'Не вдалося отримати дані за штрихкодом.');
+      
+      if (error.response && error.response.status === 404) {
+        Alert.alert('Помилка', 'Продукт не знайдено в базі даних штрихкодів.');
+      } else {
+        Alert.alert('Помилка', 'Не вдалося отримати дані за штрихкодом.');
+      }
+      
       setStep('capture');
     }
   };

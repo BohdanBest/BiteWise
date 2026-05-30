@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "BuvEuCWZNTA=",
+  "dgSpecHash": "NV28J1LTBjs=",
   "success": true,
   "projectFilePath": "/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.API.Tests/BiteWise.API.Tests.csproj",
   "expectedPackageFiles": [
@@ -16,9 +16,9 @@
     "/Users/bohdan_best/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.27/microsoft.aspnetcore.authentication.jwtbearer.8.0.27.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.aspnetcore.openapi/8.0.21/microsoft.aspnetcore.openapi.8.0.21.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.codecoverage/17.8.0/microsoft.codecoverage.17.8.0.nupkg.sha512",
-    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore/8.0.11/microsoft.entityframeworkcore.8.0.11.nupkg.sha512",
-    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.11/microsoft.entityframeworkcore.abstractions.8.0.11.nupkg.sha512",
-    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.11/microsoft.entityframeworkcore.analyzers.8.0.11.nupkg.sha512",
+    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore/8.0.27/microsoft.entityframeworkcore.8.0.27.nupkg.sha512",
+    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.27/microsoft.entityframeworkcore.abstractions.8.0.27.nupkg.sha512",
+    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.27/microsoft.entityframeworkcore.analyzers.8.0.27.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.relational/8.0.11/microsoft.entityframeworkcore.relational.8.0.11.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.extensions.caching.abstractions/10.0.8/microsoft.extensions.caching.abstractions.10.0.8.nupkg.sha512",

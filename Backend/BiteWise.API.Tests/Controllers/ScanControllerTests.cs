@@ -16,13 +16,15 @@ namespace BiteWise.API.Tests.Controllers
     {
         private readonly Mock<IMLServiceClient> _mockMlService;
         private readonly Mock<INutritionService> _mockNutritionService;
+        private readonly Mock<IBarcodeService> _mockBarcodeService;
         private readonly ScanController _sut;
 
         public ScanControllerTests()
         {
             _mockMlService = new Mock<IMLServiceClient>();
             _mockNutritionService = new Mock<INutritionService>();
-            _sut = new ScanController(_mockMlService.Object, _mockNutritionService.Object);
+            _mockBarcodeService = new Mock<IBarcodeService>();
+            _sut = new ScanController(_mockMlService.Object, _mockNutritionService.Object, _mockBarcodeService.Object);
         }
 
         [Fact]
@@ -121,7 +123,7 @@ namespace BiteWise.API.Tests.Controllers
             okResult.StatusCode.Should().Be(200);
             var scanDto = okResult.Value.Should().BeOfType<ScanResultDto>().Subject;
             scanDto.FoodName.Should().Be("Яблуко");
-            scanDto.Calories.Should().Be(104); // 52 * 2
+            scanDto.Calories.Should().Be(104); // 52 * 2 (weightMultiplier is 2.0 for 200g)
         }
 
         [Fact]

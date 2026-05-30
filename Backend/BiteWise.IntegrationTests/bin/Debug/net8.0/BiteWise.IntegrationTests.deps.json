@@ -2431,6 +2431,7 @@
           "BCrypt.Net-Next": "4.1.0",
           "BiteWise.DAL": "1.0.0",
           "FluentValidation.DependencyInjectionExtensions": "12.1.1",
+          "Microsoft.EntityFrameworkCore": "8.0.27",
           "System.IdentityModel.Tokens.Jwt": "8.18.0"
         },
         "runtime": {

@@ -13,12 +13,14 @@ namespace BiteWise.BLL.Services
         private readonly IFoodEntryRepository _foodEntryRepository;
         private readonly IUserRepository _userRepository;
         private readonly AutoMapper.IMapper _mapper;
+        private readonly IAchievementService _achievementService;
 
-        public DiaryService(IFoodEntryRepository foodEntryRepository, IUserRepository userRepository, AutoMapper.IMapper mapper)
+        public DiaryService(IFoodEntryRepository foodEntryRepository, IUserRepository userRepository, AutoMapper.IMapper mapper, IAchievementService achievementService)
         {
             _foodEntryRepository = foodEntryRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _achievementService = achievementService;
         }
 
         public async Task<FoodEntryResponseDto> AddEntryAsync(Guid userId, AddFoodEntryDto dto)
@@ -44,6 +46,9 @@ namespace BiteWise.BLL.Services
 
             await _foodEntryRepository.AddAsync(entry);
             await _foodEntryRepository.SaveChangesAsync();
+
+            // Перевіряємо та видаємо досягнення після додавання їжі
+            await _achievementService.CheckAndAwardAchievementsAsync(userId);
 
             return _mapper.Map<FoodEntryResponseDto>(entry);
         }

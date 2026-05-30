@@ -65,12 +65,12 @@ namespace BiteWise.API.Tests.Controllers
         public async Task GetDailySummary_ReturnsOk_WithSummaryDto()
         {
             // Arrange
-            var date = DateTime.UtcNow;
-            var expectedSummary = new DailySummaryDto { TotalCaloriesConsumed = 1500 };
+            var date = DateTime.UtcNow.Date;
+            var expectedSummary = new DailySummaryDto();
             _mockDiaryService.Setup(s => s.GetDailySummaryAsync(_userId, date)).ReturnsAsync(expectedSummary);
 
             // Act
-            var result = await _sut.GetDailySummary(date);
+            var result = await _sut.GetDailySummary(date.ToString("yyyy-MM-dd"));
 
             // Assert
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -82,11 +82,11 @@ namespace BiteWise.API.Tests.Controllers
         public async Task GetDailySummary_ServiceThrowsException_ReturnsBadRequest()
         {
             // Arrange
-            var date = DateTime.UtcNow;
+            var date = DateTime.UtcNow.Date;
             _mockDiaryService.Setup(s => s.GetDailySummaryAsync(_userId, date)).ThrowsAsync(new Exception("Database error"));
 
             // Act
-            var result = await _sut.GetDailySummary(date);
+            var result = await _sut.GetDailySummary(date.ToString("yyyy-MM-dd"));
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -96,12 +96,12 @@ namespace BiteWise.API.Tests.Controllers
         public async Task GetWeeklyStatistics_ReturnsOk_WithStatsDto()
         {
             // Arrange
-            var date = DateTime.UtcNow;
+            var date = DateTime.UtcNow.Date;
             var expectedStats = new WeeklyStatisticsDto();
             _mockDiaryService.Setup(s => s.GetWeeklyStatisticsAsync(_userId, date)).ReturnsAsync(expectedStats);
 
             // Act
-            var result = await _sut.GetWeeklyStatistics(date);
+            var result = await _sut.GetWeeklyStatistics(date.ToString("yyyy-MM-dd"));
 
             // Assert
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -113,11 +113,11 @@ namespace BiteWise.API.Tests.Controllers
         public async Task GetWeeklyStatistics_ServiceThrowsException_ReturnsBadRequest()
         {
             // Arrange
-            var date = DateTime.UtcNow;
+            var date = DateTime.UtcNow.Date;
             _mockDiaryService.Setup(s => s.GetWeeklyStatisticsAsync(_userId, date)).ThrowsAsync(new Exception("Error"));
 
             // Act
-            var result = await _sut.GetWeeklyStatistics(date);
+            var result = await _sut.GetWeeklyStatistics(date.ToString("yyyy-MM-dd"));
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;

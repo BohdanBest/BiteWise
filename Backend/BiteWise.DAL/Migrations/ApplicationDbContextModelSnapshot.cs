@@ -17,10 +17,80 @@ namespace BiteWise.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.26")
+                .HasAnnotation("ProductVersion", "8.0.27")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("BiteWise.DAL.Entities.Achievement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("CriteriaType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("IconName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("RequiredValue")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Achievements");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CriteriaType = 1,
+                            Description = "Додай свою першу страву в щоденник",
+                            IconName = "Utensils",
+                            RequiredValue = 1,
+                            Title = "Перший укус"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CriteriaType = 2,
+                            Description = "Введи їжу 3 дні поспіль",
+                            IconName = "Flame",
+                            RequiredValue = 3,
+                            Title = "Стабільність"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CriteriaType = 3,
+                            Description = "Введи їжу 7 днів поспіль",
+                            IconName = "Target",
+                            RequiredValue = 7,
+                            Title = "Тиждень дисципліни"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            CriteriaType = 4,
+                            Description = "Відскануй страву за допомогою ШІ-камери",
+                            IconName = "Camera",
+                            RequiredValue = 1,
+                            Title = "Майстер ШІ"
+                        });
+                });
 
             modelBuilder.Entity("BiteWise.DAL.Entities.FoodEntry", b =>
                 {
@@ -119,6 +189,31 @@ namespace BiteWise.DAL.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("BiteWise.DAL.Entities.UserAchievement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AchievementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EarnedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AchievementId");
+
+                    b.HasIndex("UserId", "AchievementId")
+                        .IsUnique();
+
+                    b.ToTable("UserAchievements");
+                });
+
             modelBuilder.Entity("BiteWise.DAL.Entities.FoodEntry", b =>
                 {
                     b.HasOne("BiteWise.DAL.Entities.User", "User")
@@ -126,6 +221,25 @@ namespace BiteWise.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BiteWise.DAL.Entities.UserAchievement", b =>
+                {
+                    b.HasOne("BiteWise.DAL.Entities.Achievement", "Achievement")
+                        .WithMany()
+                        .HasForeignKey("AchievementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BiteWise.DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Achievement");
 
                     b.Navigation("User");
                 });

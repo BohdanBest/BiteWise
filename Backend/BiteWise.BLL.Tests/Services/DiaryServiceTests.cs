@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using BiteWise.BLL.DTOs.Diary;
+using BiteWise.BLL.Interfaces;
 using BiteWise.BLL.Services;
 using BiteWise.DAL.Entities;
 using BiteWise.DAL.Interfaces;
@@ -17,6 +18,7 @@ namespace BiteWise.BLL.Tests.Services
         private readonly Mock<IFoodEntryRepository> _mockEntryRepo;
         private readonly Mock<IUserRepository> _mockUserRepo;
         private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<IAchievementService> _mockAchievementService;
         private readonly DiaryService _sut;
         private readonly Guid _userId;
 
@@ -25,8 +27,9 @@ namespace BiteWise.BLL.Tests.Services
             _mockEntryRepo = new Mock<IFoodEntryRepository>();
             _mockUserRepo = new Mock<IUserRepository>();
             _mockMapper = new Mock<IMapper>();
+            _mockAchievementService = new Mock<IAchievementService>();
 
-            _sut = new DiaryService(_mockEntryRepo.Object, _mockUserRepo.Object, _mockMapper.Object);
+            _sut = new DiaryService(_mockEntryRepo.Object, _mockUserRepo.Object, _mockMapper.Object, _mockAchievementService.Object);
             _userId = Guid.NewGuid();
         }
 

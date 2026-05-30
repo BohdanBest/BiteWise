@@ -13,6 +13,7 @@ import OnboardingResultScreen from '../screens/Onboarding/OnboardingResultScreen
 import MainTabNavigator from './MainTabNavigator';
 import SettingsScreen from '../screens/Main/SettingsScreen';
 import EditProfileScreen from '../screens/Main/EditProfileScreen';
+import AchievementsScreen from '../screens/Main/AchievementsScreen';
 import SplashScreen from '../screens/Splash/SplashScreen';
 import useAuthStore from '../store/useAuthStore';
 import { useUserStore } from '../store/useUserStore';
@@ -54,6 +55,7 @@ export default function AppNavigator() {
               <Stack.Screen name="Main" component={MainTabNavigator} />
               <Stack.Screen name="Settings" component={SettingsScreen} />
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+              <Stack.Screen name="Achievements" component={AchievementsScreen} />
             </>
           )}
         </Stack.Navigator>

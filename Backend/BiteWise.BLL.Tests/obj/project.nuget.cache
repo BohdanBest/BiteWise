@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dKR4wxlS4nQ=",
+  "dgSpecHash": "i6oGt0bw4K8=",
   "success": true,
   "projectFilePath": "/Users/bohdan_best/Documents/університет/3 курс/Курсова/BiteWise/Backend/BiteWise.BLL.Tests/BiteWise.BLL.Tests.csproj",
   "expectedPackageFiles": [
@@ -12,9 +12,9 @@
     "/Users/bohdan_best/.nuget/packages/fluentvalidation/12.1.1/fluentvalidation.12.1.1.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/fluentvalidation.dependencyinjectionextensions/12.1.1/fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.codecoverage/17.8.0/microsoft.codecoverage.17.8.0.nupkg.sha512",
-    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore/8.0.11/microsoft.entityframeworkcore.8.0.11.nupkg.sha512",
-    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.11/microsoft.entityframeworkcore.abstractions.8.0.11.nupkg.sha512",
-    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.11/microsoft.entityframeworkcore.analyzers.8.0.11.nupkg.sha512",
+    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore/8.0.27/microsoft.entityframeworkcore.8.0.27.nupkg.sha512",
+    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.27/microsoft.entityframeworkcore.abstractions.8.0.27.nupkg.sha512",
+    "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.27/microsoft.entityframeworkcore.analyzers.8.0.27.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.entityframeworkcore.relational/8.0.11/microsoft.entityframeworkcore.relational.8.0.11.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.extensions.caching.abstractions/8.0.0/microsoft.extensions.caching.abstractions.8.0.0.nupkg.sha512",
     "/Users/bohdan_best/.nuget/packages/microsoft.extensions.caching.memory/8.0.1/microsoft.extensions.caching.memory.8.0.1.nupkg.sha512",
