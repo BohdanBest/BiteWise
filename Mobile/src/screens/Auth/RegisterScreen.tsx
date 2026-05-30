@@ -1,13 +1,35 @@
-import React from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
+import { useRegistrationStore } from '../../store/useRegistrationStore';
 
 export default function RegisterScreen({ navigation }: any) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+  const updateData = useRegistrationStore((state) => state.updateData);
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   const handleRegister = () => {
+    if (!name || !email || !password) {
+      Alert.alert('Помилка', 'Будь ласка, заповніть всі поля');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      Alert.alert('Помилка', 'Паролі не співпадають');
+      return;
+    }
+
+    updateData({ name, email, password });
     navigation.navigate('OnboardingGender');
   };
 
@@ -27,7 +49,7 @@ export default function RegisterScreen({ navigation }: any) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
-            <ArrowLeft size={24} color={Theme.colors.foreground} />
+            <ArrowLeft size={24} color={theme.colors.foreground} />
           </TouchableOpacity>
 
           {/* Заголовок */}
@@ -42,6 +64,8 @@ export default function RegisterScreen({ navigation }: any) {
               label="ІМ'Я" 
               placeholder="Ваше ім'я" 
               autoCapitalize="words" 
+              value={name}
+              onChangeText={setName}
             />
             
             <Input 
@@ -49,24 +73,30 @@ export default function RegisterScreen({ navigation }: any) {
               placeholder="your@email.com" 
               keyboardType="email-address" 
               autoCapitalize="none" 
+              value={email}
+              onChangeText={setEmail}
             />
             
             <Input 
               label="ПАРОЛЬ" 
               placeholder="••••••••" 
               isPassword
+              value={password}
+              onChangeText={setPassword}
             />
 
             <Input 
               label="ПІДТВЕРДЖЕННЯ" 
               placeholder="••••••••" 
               isPassword
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
             />
             
             <Button 
               title="Зареєструватися" 
               onPress={handleRegister} 
-              rightIcon={<ArrowRight size={20} color={Theme.colors.primaryForeground} />}
+              rightIcon={<ArrowRight size={20} color={theme.colors.primaryForeground} />}
               style={styles.registerButton}
             />
           </View>
@@ -76,27 +106,27 @@ export default function RegisterScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   keyboardView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: Theme.spacing.pageHorizontal,
+    paddingHorizontal: theme.spacing.pageHorizontal,
     paddingBottom: 40,
     paddingTop: 20,
   },
   backButton: {
     width: 48,
     height: 48,
-    borderRadius: Theme.radius.md,
-    backgroundColor: Theme.colors.card,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 32,
@@ -105,19 +135,19 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: { 
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 36,
-    color: Theme.colors.foreground,
-    marginBottom: Theme.spacing.xs,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    ...Theme.typography.bodyL,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.bodyL,
+    color: theme.colors.mutedForeground,
   },
   form: {
     flex: 1,
   },
   registerButton: {
-    marginTop: Theme.spacing.m,
+    marginTop: theme.spacing.m,
   },
 });

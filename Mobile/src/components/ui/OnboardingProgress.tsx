@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 
 interface OnboardingProgressProps {
   currentStep: number;
@@ -8,6 +9,8 @@ interface OnboardingProgressProps {
 }
 
 export default function OnboardingProgress({ currentStep, totalSteps = 4 }: OnboardingProgressProps) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   return (
     <View style={styles.container}>
       {Array.from({ length: totalSteps }).map((_, index) => (
@@ -23,7 +26,7 @@ export default function OnboardingProgress({ currentStep, totalSteps = 4 }: Onbo
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     gap: 8,
@@ -33,9 +36,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Theme.colors.muted,
+    backgroundColor: theme.colors.muted,
   },
   progressActive: {
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: theme.colors.primary,
   },
 });

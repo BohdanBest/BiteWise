@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, Animated, Dimensions } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import mascot from "../../../assets/mascot-wave.png";
 const { width } = Dimensions.get('window');
 
@@ -11,6 +12,8 @@ interface SplashProps {
 }
 
 export default function SplashScreen({ isReady, onFinish }: SplashProps) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
@@ -43,7 +46,7 @@ export default function SplashScreen({ isReady, onFinish }: SplashProps) {
       Animated.timing(containerOpacity, {
         toValue: 0,
         duration: 500, // Плавне зникнення за 0.5с
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start(() => {
         if (onFinish) onFinish();
       });
@@ -60,10 +63,10 @@ export default function SplashScreen({ isReady, onFinish }: SplashProps) {
             <Svg height="400" width="400">
               <Defs>
                 <RadialGradient id="glow" cx="50%" cy="50%" rx="50%" ry="50%" fx="50%" fy="50%">
-                  <Stop offset="0%" stopColor={Theme.colors.primary} stopOpacity="0.3" />
-                  <Stop offset="30%" stopColor={Theme.colors.primary} stopOpacity="0.1" />
-                  <Stop offset="70%" stopColor={Theme.colors.primary} stopOpacity="0.02" />
-                  <Stop offset="100%" stopColor={Theme.colors.primary} stopOpacity="0" />
+                  <Stop offset="0%" stopColor={theme.colors.primary} stopOpacity="0.3" />
+                  <Stop offset="30%" stopColor={theme.colors.primary} stopOpacity="0.1" />
+                  <Stop offset="70%" stopColor={theme.colors.primary} stopOpacity="0.02" />
+                  <Stop offset="100%" stopColor={theme.colors.primary} stopOpacity="0" />
                 </RadialGradient>
               </Defs>
               <Rect x="0" y="0" width="400" height="400" fill="url(#glow)" />
@@ -79,8 +82,8 @@ export default function SplashScreen({ isReady, onFinish }: SplashProps) {
 
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }], alignItems: 'center' }}>
           <View style={styles.logoContainer}>
-            <Text style={[styles.logoText, { color: Theme.colors.primary }]}>Nutri</Text>
-            <Text style={[styles.logoText, { color: Theme.colors.foreground }]}>Scan</Text>
+            <Text style={[styles.logoText, { color: theme.colors.primary }]}>Nutri</Text>
+            <Text style={[styles.logoText, { color: theme.colors.foreground }]}>Scan</Text>
           </View>
           <Text style={styles.subtitle}>SMART NUTRITION TRACKING</Text>
         </Animated.View>
@@ -89,10 +92,10 @@ export default function SplashScreen({ isReady, onFinish }: SplashProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject, // Перекриває весь екран
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -110,11 +113,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   logoText: {
-    ...Theme.typography.displayXl,
+    ...theme.typography.displayXl,
   },
   subtitle: {
-    ...Theme.typography.overline,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.overline,
+    color: theme.colors.mutedForeground,
     marginTop: 10,
     letterSpacing: 4,
   },

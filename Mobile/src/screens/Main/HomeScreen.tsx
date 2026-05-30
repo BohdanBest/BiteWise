@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -15,15 +16,70 @@ import {
   Sparkles,
   Sun,
   Sunrise,
+  Moon,
+  Coffee,
 } from "lucide-react-native";
 import { Theme } from "../../constants/theme";
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import CircularProgress from "../../components/ui/CircularProgress";
 import LinearProgress from "../../components/ui/LinearProgress";
+import { useNavigation } from "@react-navigation/native";
 
-// @ts-ignore
 import mascotImg from "../../../assets/mascot.png";
+import { useUserStore } from "../../store/useUserStore";
+import { useDiaryStore, FoodEntryResponseDto } from "../../store/useDiaryStore";
+
+const MONTHS_UA = [
+  "січ.", "лют.", "бер.", "квіт.", "трав.", "черв.",
+  "лип.", "серп.", "вер.", "жовт.", "лист.", "груд."
+];
+
+const MEAL_TYPES = [
+  { id: 0, title: "Сніданок", icon: Sunrise },
+  { id: 1, title: "Обід", icon: Sun },
+  { id: 2, title: "Вечеря", icon: Moon },
+  { id: 3, title: "Перекус", icon: Coffee },
+];
 
 export default function HomeScreen() {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+  const navigation = useNavigation<any>();
+  const { profile } = useUserStore();
+  const { selectedDate, summary, isLoading, fetchSummary, changeDate } = useDiaryStore();
+
+  useEffect(() => {
+    fetchSummary(selectedDate);
+  }, [selectedDate]);
+
+  const dateText = `${selectedDate.getDate()} ${MONTHS_UA[selectedDate.getMonth()]}`;
+
+  const dailyGoal = profile?.dailyCalorieGoal || 2000;
+  const consumed = summary?.totalCaloriesConsumed || 0;
+  const remaining = summary?.remainingCalories ?? dailyGoal;
+
+  // Macros Targets
+  const targetProtein = Math.round((dailyGoal * 0.3) / 4);
+  const targetFat = Math.round((dailyGoal * 0.3) / 9);
+  const targetCarbs = Math.round((dailyGoal * 0.4) / 4);
+
+  const currentProtein = summary?.totalProteins || 0;
+  const currentFat = summary?.totalFats || 0;
+  const currentCarbs = summary?.totalCarbs || 0;
+
+  // Group meals
+  const entriesByMeal = useMemo(() => {
+    const groups: Record<number, FoodEntryResponseDto[]> = { 0: [], 1: [], 2: [], 3: [] };
+    if (summary?.entries) {
+      summary.entries.forEach(entry => {
+        if (groups[entry.mealType]) {
+          groups[entry.mealType].push(entry);
+        }
+      });
+    }
+    return groups;
+  }, [summary?.entries]);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <ScrollView
@@ -41,151 +97,162 @@ export default function HomeScreen() {
             </View>
             <View>
               <Text style={styles.greetingText}>ПРИВІТ 👋</Text>
-              <Text style={styles.userName}>Олександр</Text>
+              <Text style={styles.userName}>
+                {profile?.name ? profile.name.split(" ")[0] : "Користувач"}
+              </Text>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.dateSelector} activeOpacity={0.7}>
-            <ChevronLeft size={16} color={Theme.colors.mutedForeground} />
-            <Text style={styles.dateText}>25 трав.</Text>
-            <ChevronRight size={16} color={Theme.colors.mutedForeground} />
-          </TouchableOpacity>
+          <View style={styles.dateSelector}>
+            <TouchableOpacity onPress={() => changeDate(-1)} activeOpacity={0.7} style={{ padding: 4 }}>
+              <ChevronLeft size={20} color={theme.colors.mutedForeground} />
+            </TouchableOpacity>
+            <Text style={styles.dateText}>{dateText}</Text>
+            <TouchableOpacity onPress={() => changeDate(1)} activeOpacity={0.7} style={{ padding: 4 }}>
+              <ChevronRight size={20} color={theme.colors.mutedForeground} />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Motivation Banner */}
-        <View style={styles.motivationBanner}>
-          <Sparkles size={16} color={Theme.colors.primary} />
-          <Text style={styles.motivationText}>Чудовий прогрес сьогодні!</Text>
-        </View>
+        {consumed > 0 && (
+          <View style={styles.motivationBanner}>
+            <Sparkles size={16} color={theme.colors.primary} />
+            <Text style={styles.motivationText}>Чудовий прогрес сьогодні!</Text>
+          </View>
+        )}
 
         {/* Dashboard Card */}
         <View style={styles.dashboardCard}>
-          <View style={styles.dashboardContent}>
-            <View style={styles.circularProgressContainer}>
-              <CircularProgress
-                size={140}
-                strokeWidth={12}
-                currentValue={1517}
-                maxValue={2400}
-                color={Theme.colors.primary}>
-                <View style={styles.circularContent}>
-                  <Text style={styles.caloriesNumber}>883</Text>
-                  <Text style={styles.caloriesLabel}>ЗАЛИШИЛОСЬ</Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginVertical: 40 }} />
+          ) : (
+            <View style={styles.dashboardContent}>
+              <View style={styles.circularProgressContainer}>
+                <CircularProgress
+                  size={140}
+                  strokeWidth={12}
+                  currentValue={consumed}
+                  maxValue={dailyGoal}
+                  color={theme.colors.primary}>
+                  <View style={styles.circularContent}>
+                    <Text style={styles.caloriesNumber}>{remaining}</Text>
+                    <Text style={styles.caloriesLabel}>ЗАЛИШИЛОСЬ</Text>
+                  </View>
+                </CircularProgress>
+              </View>
+
+              <View style={styles.macrosContainer}>
+                <View style={styles.consumedHeader}>
+                  <Text style={styles.consumedNumber}>{consumed}</Text>
+                  <Text style={styles.consumedLabel}>З'ЇДЕНО ККАЛ</Text>
                 </View>
-              </CircularProgress>
+
+                <View style={styles.macroRow}>
+                  <View style={styles.macroHeader}>
+                    <Text style={styles.macroLabel}>БІЛКИ</Text>
+                    <Text style={styles.macroValue}>{Math.round(currentProtein)}/{targetProtein}г</Text>
+                  </View>
+                  <LinearProgress
+                    currentValue={currentProtein}
+                    maxValue={targetProtein}
+                    color={theme.colors.primary}
+                    height={6}
+                  />
+                </View>
+
+                <View style={styles.macroRow}>
+                  <View style={styles.macroHeader}>
+                    <Text style={styles.macroLabel}>ЖИРИ</Text>
+                    <Text style={styles.macroValue}>{Math.round(currentFat)}/{targetFat}г</Text>
+                  </View>
+                  <LinearProgress
+                    currentValue={currentFat}
+                    maxValue={targetFat}
+                    color={theme.colors.warning}
+                    height={6}
+                  />
+                </View>
+
+                <View style={styles.macroRow}>
+                  <View style={styles.macroHeader}>
+                    <Text style={styles.macroLabel}>ВУГЛЕВОДИ</Text>
+                    <Text style={styles.macroValue}>{Math.round(currentCarbs)}/{targetCarbs}г</Text>
+                  </View>
+                  <LinearProgress
+                    currentValue={currentCarbs}
+                    maxValue={targetCarbs}
+                    color={theme.colors.primary}
+                    height={6}
+                  />
+                </View>
+              </View>
             </View>
-
-            <View style={styles.macrosContainer}>
-              <View style={styles.consumedHeader}>
-                <Text style={styles.consumedNumber}>1517</Text>
-                <Text style={styles.consumedLabel}>З'ЇДЕНО ККАЛ</Text>
-              </View>
-
-              <View style={styles.macroRow}>
-                <View style={styles.macroHeader}>
-                  <Text style={styles.macroLabel}>БІЛКИ</Text>
-                  <Text style={styles.macroValue}>110/150г</Text>
-                </View>
-                <LinearProgress
-                  currentValue={110}
-                  maxValue={150}
-                  color={Theme.colors.primary}
-                  height={6}
-                />
-              </View>
-
-              <View style={styles.macroRow}>
-                <View style={styles.macroHeader}>
-                  <Text style={styles.macroLabel}>ЖИРИ</Text>
-                  <Text style={styles.macroValue}>58/80г</Text>
-                </View>
-                <LinearProgress
-                  currentValue={58}
-                  maxValue={80}
-                  color={Theme.colors.warning}
-                  height={6}
-                />
-              </View>
-
-              <View style={styles.macroRow}>
-                <View style={styles.macroHeader}>
-                  <Text style={styles.macroLabel}>ВУГЛЕВОДИ</Text>
-                  <Text style={styles.macroValue}>137/300г</Text>
-                </View>
-                <LinearProgress
-                  currentValue={137}
-                  maxValue={300}
-                  color={Theme.colors.primary}
-                  height={6}
-                />
-              </View>
-            </View>
-          </View>
+          )}
         </View>
 
         {/* Meals Section */}
         <View style={styles.mealsHeader}>
           <Text style={styles.mealsTitle}>Прийоми їжі</Text>
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.8}>
-            <Plus size={24} color={Theme.colors.background} />
+          <TouchableOpacity 
+            style={styles.addButton} 
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("ScanTab")}
+          >
+            <Plus size={24} color={theme.colors.background} />
           </TouchableOpacity>
         </View>
 
-        {/* Meal Card: Сніданок */}
-        <View style={styles.mealCard}>
-          <View style={styles.mealCardHeader}>
-            <View style={styles.mealTitleRow}>
-              <Sunrise
-                size={20}
-                color={Theme.colors.warning}
-                style={{ marginRight: 12 }}
-              />
-              <Text style={styles.mealTitle}>Сніданок</Text>
-            </View>
-            <View style={styles.mealCaloriesBadge}>
-              <Text style={styles.mealCaloriesText}>482 ккал</Text>
-            </View>
-          </View>
+        {/* Render Meal Cards */}
+        {MEAL_TYPES.map(meal => {
+          const items = entriesByMeal[meal.id] || [];
+          const mealCalories = items.reduce((sum, item) => sum + item.calories, 0);
+          const IconComponent = meal.icon;
 
-          <View style={styles.foodItem}>
-            <Text style={styles.foodName}>Вівсянка</Text>
-            <Text style={styles.foodDetails}>250г · 375 ккал</Text>
-          </View>
-          <View style={styles.foodItem}>
-            <Text style={styles.foodName}>Банан</Text>
-            <Text style={styles.foodDetails}>120г · 107 ккал</Text>
-          </View>
-        </View>
+          return (
+            <View key={meal.id} style={styles.mealCard}>
+              <View style={styles.mealCardHeader}>
+                <View style={styles.mealTitleRow}>
+                  <IconComponent
+                    size={20}
+                    color={theme.colors.warning}
+                    style={{ marginRight: 12 }}
+                  />
+                  <Text style={styles.mealTitle}>{meal.title}</Text>
+                </View>
+                {mealCalories > 0 && (
+                  <View style={styles.mealCaloriesBadge}>
+                    <Text style={styles.mealCaloriesText}>{mealCalories} ккал</Text>
+                  </View>
+                )}
+              </View>
 
-        {/* Meal Card: Обід */}
-        <View style={styles.mealCard}>
-          <View style={styles.mealCardHeader}>
-            <View style={styles.mealTitleRow}>
-              <Sun
-                size={20}
-                color={Theme.colors.warning}
-                style={{ marginRight: 12 }}
-              />
-              <Text style={styles.mealTitle}>Обід</Text>
+              {items.map((item) => (
+                <View key={item.id} style={styles.foodItem}>
+                  <Text style={styles.foodName}>{item.foodName}</Text>
+                  <Text style={styles.foodDetails}>{item.weightGrams}г · {item.calories} ккал</Text>
+                </View>
+              ))}
+
+              {items.length === 0 && (
+                <Text style={styles.emptyMealText}>Ще нічого не додано</Text>
+              )}
             </View>
-            <View style={styles.mealCaloriesBadge}>
-              <Text style={styles.mealCaloriesText}>815 ккал</Text>
-            </View>
-          </View>
-        </View>
+          );
+        })}
+
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    paddingHorizontal: Theme.spacing.pageHorizontal,
-    paddingTop: Theme.spacing.m,
+    paddingHorizontal: theme.spacing.pageHorizontal,
+    paddingTop: theme.spacing.m,
     paddingBottom: 100, // Space for bottom nav
   },
 
@@ -194,7 +261,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Theme.spacing.l,
+    marginBottom: theme.spacing.l,
   },
   userInfo: {
     flexDirection: "row",
@@ -205,7 +272,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Theme.colors.card,
+    backgroundColor: theme.colors.card,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -216,29 +283,30 @@ const styles = StyleSheet.create({
     marginTop: 6, // adjust mascot position
   },
   greetingText: {
-    ...Theme.typography.overline,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.overline,
+    color: theme.colors.mutedForeground,
     marginBottom: 2,
   },
   userName: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 18,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
   dateSelector: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    backgroundColor: Theme.colors.card,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: Theme.radius.full,
+    gap: 4,
+    backgroundColor: theme.colors.card,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: theme.radius.full,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
   },
   dateText: {
-    ...Theme.typography.body,
-    color: Theme.colors.foreground,
+    ...theme.typography.body,
+    color: theme.colors.foreground,
+    marginHorizontal: 4,
   },
 
   motivationBanner: {
@@ -250,27 +318,29 @@ const styles = StyleSheet.create({
     borderColor: "rgba(21, 191, 99, 0.2)",
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: Theme.radius.full,
+    borderRadius: theme.radius.full,
     alignSelf: "flex-start",
-    marginBottom: Theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
   },
   motivationText: {
-    ...Theme.typography.body,
-    color: Theme.colors.foreground,
+    ...theme.typography.body,
+    color: theme.colors.foreground,
   },
 
   dashboardCard: {
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.l,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.l,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
-    marginBottom: Theme.spacing.xl,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.xl,
+    minHeight: 180,
+    justifyContent: 'center'
   },
   dashboardContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Theme.spacing.l,
+    gap: theme.spacing.l,
   },
   circularProgressContainer: {
     width: 140,
@@ -283,13 +353,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   caloriesNumber: {
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 32,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     paddingHorizontal: 4, // Запобігає обрізанню
   },
   caloriesLabel: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 10,
     marginTop: 2,
     textTransform: "uppercase",
@@ -299,22 +369,22 @@ const styles = StyleSheet.create({
   },
   consumedHeader: {
     alignItems: "flex-end",
-    marginBottom: Theme.spacing.l,
+    marginBottom: theme.spacing.l,
   },
   consumedNumber: {
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 28,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     lineHeight: 32,
     paddingHorizontal: 4, // Запобігає обрізанню
   },
   consumedLabel: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 10,
     textTransform: "uppercase",
   },
   macroRow: {
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   macroHeader: {
     flexDirection: "row",
@@ -322,14 +392,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   macroLabel: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 10,
     textTransform: "uppercase",
   },
   macroValue: {
-    fontFamily: Theme.typography.tabularNums.fontFamily,
+    fontFamily: theme.typography.tabularNums.fontFamily,
     fontSize: 11,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     paddingHorizontal: 4, // Запобігає обрізанню
   },
 
@@ -338,67 +408,74 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   mealsTitle: {
-    fontFamily: Theme.typography.h2.fontFamily,
+    fontFamily: theme.typography.h2.fontFamily,
     fontSize: 22,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
   addButton: {
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     width: 40,
     height: 40,
-    borderRadius: Theme.radius.md,
+    borderRadius: theme.radius.md,
     justifyContent: "center",
     alignItems: "center",
   },
   mealCard: {
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.l,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.l,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
-    marginBottom: Theme.spacing.m,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.m,
   },
   mealCardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   mealTitleRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   mealTitle: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 18,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
   mealCaloriesBadge: {
     backgroundColor: "rgba(21, 191, 99, 0.1)",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: Theme.radius.full,
+    borderRadius: theme.radius.full,
   },
   mealCaloriesText: {
-    fontFamily: Theme.typography.tabularNums.fontFamily,
+    fontFamily: theme.typography.tabularNums.fontFamily,
     fontSize: 12,
-    color: Theme.colors.primary,
+    color: theme.colors.primary,
   },
   foodItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Theme.spacing.xs,
+    marginBottom: theme.spacing.s,
   },
   foodName: {
-    ...Theme.typography.body,
-    color: Theme.colors.foreground,
+    ...theme.typography.body,
+    color: theme.colors.foreground,
+    flex: 1,
   },
   foodDetails: {
-    ...Theme.typography.caption,
-    fontFamily: Theme.typography.tabularNums.fontFamily,
+    ...theme.typography.caption,
+    fontFamily: theme.typography.tabularNums.fontFamily,
+    marginLeft: 8,
   },
+  emptyMealText: {
+    ...theme.typography.caption,
+    fontStyle: 'italic',
+    marginTop: -4,
+  }
 });

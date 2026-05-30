@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import Button from '../../components/ui/Button';
 import OnboardingProgress from '../../components/ui/OnboardingProgress';
+import { useRegistrationStore, Gender } from '../../store/useRegistrationStore';
 
 export default function OnboardingGenderScreen({ navigation }: any) {
-  const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+  const [selectedGender, setSelectedGender] = useState<Gender | null>(null);
+  const updateData = useRegistrationStore((state) => state.updateData);
 
   const handleNext = () => {
-    if (selectedGender) {
-      console.log('Обрано стать:', selectedGender);
+    if (selectedGender !== null) {
+      updateData({ gender: selectedGender });
       navigation.navigate('OnboardingMetrics');
     }
   };
@@ -31,30 +36,30 @@ export default function OnboardingGenderScreen({ navigation }: any) {
           <TouchableOpacity 
             style={[
               styles.card,
-              selectedGender === 'male' && styles.cardActive
+              selectedGender === Gender.Male && styles.cardActive
             ]}
-            onPress={() => setSelectedGender('male')}
+            onPress={() => setSelectedGender(Gender.Male)}
             activeOpacity={0.8}
           >
             <Text style={styles.emoji}>👦</Text>
             <Text style={[
               styles.cardText,
-              selectedGender === 'male' && styles.cardTextActive
+              selectedGender === Gender.Male && styles.cardTextActive
             ]}>Чоловіча</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={[
               styles.card,
-              selectedGender === 'female' && styles.cardActive
+              selectedGender === Gender.Female && styles.cardActive
             ]}
-            onPress={() => setSelectedGender('female')}
+            onPress={() => setSelectedGender(Gender.Female)}
             activeOpacity={0.8}
           >
             <Text style={styles.emoji}>👩</Text>
             <Text style={[
               styles.cardText,
-              selectedGender === 'female' && styles.cardTextActive
+              selectedGender === Gender.Female && styles.cardTextActive
             ]}>Жіноча</Text>
           </TouchableOpacity>
         </View>
@@ -65,36 +70,36 @@ export default function OnboardingGenderScreen({ navigation }: any) {
         <Button 
           title="Далі" 
           onPress={handleNext} 
-          variant={selectedGender ? 'primary' : 'secondary'}
+          variant={selectedGender !== null ? 'primary' : 'secondary'}
         />
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
-    paddingHorizontal: Theme.spacing.pageHorizontal,
-    paddingTop: Theme.spacing.l,
-    paddingBottom: Theme.spacing.pageHorizontal, // padding for the bottom button
+    paddingHorizontal: theme.spacing.pageHorizontal,
+    paddingTop: theme.spacing.l,
+    paddingBottom: theme.spacing.pageHorizontal, // padding for the bottom button
   },
   header: {
     marginBottom: 40,
   },
   title: {
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 32,
-    color: Theme.colors.foreground,
-    marginBottom: Theme.spacing.xs,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    ...Theme.typography.body,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
   },
   cardsContainer: {
     flexDirection: 'row',
@@ -103,30 +108,30 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     aspectRatio: 1, // Робить квадратним
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
     borderWidth: 2,
     borderColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: Theme.spacing.m,
+    padding: theme.spacing.m,
   },
   cardActive: {
-    borderColor: Theme.colors.primary,
-    backgroundColor: Theme.colors.background, // Темніший фон при виборі
-    ...Theme.shadows.glowPrimary, // Світіння навколо
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.background, // Темніший фон при виборі
+    ...theme.shadows.glowPrimary, // Світіння навколо
   },
   emoji: {
     fontSize: 48,
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   cardText: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 16,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
   cardTextActive: {
-    color: Theme.colors.primary,
+    color: theme.colors.primary,
   },
   spacer: {
     flex: 1, // Виштовхує кнопку вниз

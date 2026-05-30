@@ -10,6 +10,7 @@ namespace BiteWise.DAL.Interfaces
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByNameAsync(string name);
         Task AddAsync(User user);
+        Task DeleteAsync(User user);
         Task SaveChangesAsync();
     }
 }

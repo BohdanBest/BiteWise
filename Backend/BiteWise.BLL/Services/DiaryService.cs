@@ -108,17 +108,26 @@ namespace BiteWise.BLL.Services
                 });
             }
 
-            // 2. Рахуємо Середнє, Мін, Макс
-            // Враховуємо тільки дні, коли користувач щось їв (для середнього), або всі дні?
-            // Логічніше рахувати середнє тільки за активні дні, але можна і за всі 7.
-            // Візьмемо просте середнє за 7 днів.
+            // Середнє значення зазвичай рахують за всі 7 днів тижня, 
+            // щоб бачити реальну середню кількість калорій на день.
             result.AverageCalories = (int)result.DailyCalories.Average(d => d.Calories);
 
-            var maxDay = result.DailyCalories.OrderByDescending(d => d.Calories).First();
-            result.MaxCalories = new StatRecordDto { Value = maxDay.Calories, DayOfWeek = maxDay.DayOfWeek };
+            var activeDays = result.DailyCalories.Where(d => d.Calories > 0).ToList();
 
-            var minDay = result.DailyCalories.OrderBy(d => d.Calories).First();
-            result.MinCalories = new StatRecordDto { Value = minDay.Calories, DayOfWeek = minDay.DayOfWeek };
+            if (activeDays.Any())
+            {
+                var maxDay = activeDays.OrderByDescending(d => d.Calories).First();
+                result.MaxCalories = new StatRecordDto { Value = maxDay.Calories, DayOfWeek = maxDay.DayOfWeek };
+
+                var minDay = activeDays.OrderBy(d => d.Calories).First();
+                result.MinCalories = new StatRecordDto { Value = minDay.Calories, DayOfWeek = minDay.DayOfWeek };
+            }
+            else
+            {
+                result.AverageCalories = 0;
+                result.MaxCalories = new StatRecordDto { Value = 0, DayOfWeek = "-" };
+                result.MinCalories = new StatRecordDto { Value = 0, DayOfWeek = "-" };
+            }
 
             // 3. Топ-5 страв
             var topFoods = entries
@@ -135,6 +144,18 @@ namespace BiteWise.BLL.Services
             result.TopFoods = topFoods;
 
             return result;
+        }
+
+        public async Task RemoveEntryAsync(Guid userId, Guid entryId)
+        {
+            var entry = await _foodEntryRepository.GetByIdAsync(entryId);
+            if (entry == null || entry.UserId != userId)
+            {
+                throw new Exception("Запис не знайдено або немає прав на видалення.");
+            }
+
+            await _foodEntryRepository.DeleteAsync(entry);
+            await _foodEntryRepository.SaveChangesAsync();
         }
     }
 }

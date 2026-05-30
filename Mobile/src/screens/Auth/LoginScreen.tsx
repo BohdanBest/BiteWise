@@ -1,19 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowRight } from 'lucide-react-native';
 import useAuthStore from '../../store/useAuthStore';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 
 import mascot from "../../../assets/mascot-wave.png";
 
 export default function LoginScreen({ navigation }: any) {
-  const setToken = useAuthStore((state) => state.setToken);
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+  const login = useAuthStore((state) => state.login);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    setToken('fake-jwt-token-for-testing');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Помилка', 'Будь ласка, введіть email та пароль');
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      await login({ email, password });
+    } catch (error: any) {
+      Alert.alert('Помилка входу', error.response?.data?.message || 'Невірний email або пароль');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,18 +52,23 @@ export default function LoginScreen({ navigation }: any) {
             placeholder="your@email.com" 
             keyboardType="email-address" 
             autoCapitalize="none" 
+            value={email}
+            onChangeText={setEmail}
           />
           
           <Input 
             label="ПАРОЛЬ" 
             placeholder="••••••••" 
             isPassword
+            value={password}
+            onChangeText={setPassword}
           />
           
           <Button 
-            title="Увійти" 
+            title={isLoading ? "Вхід..." : "Увійти"} 
             onPress={handleLogin} 
-            rightIcon={<ArrowRight size={20} color={Theme.colors.primaryForeground} />}
+            disabled={isLoading}
+            rightIcon={<ArrowRight size={20} color={theme.colors.primaryForeground} />}
             style={styles.loginButton}
           />
         </View>
@@ -61,15 +84,15 @@ export default function LoginScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   container: { 
     flex: 1, 
     justifyContent: 'center', 
-    paddingHorizontal: Theme.spacing.pageHorizontal,
+    paddingHorizontal: theme.spacing.pageHorizontal,
   },
   header: {
     alignItems: 'center',
@@ -78,25 +101,25 @@ const styles = StyleSheet.create({
   mascot: {
     width: 80,
     height: 80,
-    marginBottom: Theme.spacing.l,
+    marginBottom: theme.spacing.l,
   },
   title: { 
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 42,
-    color: Theme.colors.primary,
+    color: theme.colors.primary,
     textAlign: 'center',
-    marginBottom: Theme.spacing.xs,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    ...Theme.typography.bodyL,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.bodyL,
+    color: theme.colors.mutedForeground,
     textAlign: 'center',
   },
   form: {
     marginBottom: 40,
   },
   loginButton: {
-    marginTop: Theme.spacing.m,
+    marginTop: theme.spacing.m,
   },
   footer: {
     flexDirection: 'row',
@@ -104,12 +127,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerText: {
-    ...Theme.typography.body,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
   },
   registerText: {
-    ...Theme.typography.body,
-    color: Theme.colors.primary,
-    fontFamily: Theme.typography.h3.fontFamily,
+    ...theme.typography.body,
+    color: theme.colors.primary,
+    fontFamily: theme.typography.h3.fontFamily,
   }
 });

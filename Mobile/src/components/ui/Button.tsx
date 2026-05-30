@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, ActivityIndicator, Animated, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 
 interface ButtonProps {
   title: string;
@@ -13,6 +14,8 @@ interface ButtonProps {
 }
 
 export default function Button({ title, onPress, variant = 'primary', isLoading, rightIcon, style }: ButtonProps) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   const isPrimary = variant === 'primary';
   const isSecondary = variant === 'secondary';
   
@@ -35,7 +38,7 @@ export default function Button({ title, onPress, variant = 'primary', isLoading,
   const content = (
     <>
       {isLoading ? (
-        <ActivityIndicator color={isPrimary ? Theme.colors.primaryForeground : Theme.colors.primary} />
+        <ActivityIndicator color={isPrimary ? theme.colors.primaryForeground : theme.colors.primary} />
       ) : (
         <View style={styles.contentRow}>
           <Text style={[
@@ -43,7 +46,7 @@ export default function Button({ title, onPress, variant = 'primary', isLoading,
             isPrimary && styles.textPrimary,
             isSecondary && styles.textSecondary,
             variant === 'ghost' && styles.textGhost,
-            rightIcon ? { marginRight: Theme.spacing.s } : null
+            rightIcon ? { marginRight: theme.spacing.s } : null
           ]}>
             {title}
           </Text>
@@ -65,10 +68,10 @@ export default function Button({ title, onPress, variant = 'primary', isLoading,
           style={style}
         >
           <LinearGradient
-            colors={[Theme.colors.primary, Theme.colors.secondary]}
+            colors={[theme.colors.primary, theme.colors.secondary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[styles.base, styles.primary, Theme.shadows.glowPrimary]}
+            style={[styles.base, styles.primary, theme.shadows.glowPrimary]}
           >
             {content}
           </LinearGradient>
@@ -94,10 +97,10 @@ export default function Button({ title, onPress, variant = 'primary', isLoading,
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   base: {
     height: 56, // h-14
-    borderRadius: Theme.radius.lg,
+    borderRadius: theme.radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
@@ -106,9 +109,9 @@ const styles = StyleSheet.create({
     // Всі стилі в LinearGradient
   },
   secondary: {
-    backgroundColor: Theme.colors.card,
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -119,16 +122,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 16,
   },
   textPrimary: {
-    color: Theme.colors.primaryForeground,
+    color: theme.colors.primaryForeground,
   },
   textSecondary: {
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
   textGhost: {
-    color: Theme.colors.mutedForeground,
+    color: theme.colors.mutedForeground,
   }
 });

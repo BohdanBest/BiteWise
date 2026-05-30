@@ -8,5 +8,6 @@ namespace BiteWise.BLL.Interfaces
     {
         Task<UserProfileDto> GetProfileAsync(Guid userId);
         Task<UserProfileDto> UpdateProfileAsync(Guid userId, UpdateProfileDto dto);
+        Task DeleteAccountAsync(Guid userId);
     }
 }

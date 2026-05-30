@@ -1,22 +1,42 @@
 // src/constants/theme.ts
+export const lightColors = {
+  background: 'hsl(0, 0%, 98%)',
+  foreground: 'hsl(150, 30%, 4%)',
+  card: 'hsl(0, 0%, 100%)',
+  cardForeground: 'hsl(150, 30%, 4%)',
+  primary: 'hsl(142, 71%, 45%)',
+  primaryDark: 'hsl(142, 76%, 36%)',
+  primaryForeground: 'hsl(0, 0%, 100%)',
+  secondary: 'hsl(152, 60%, 52%)',
+  accent: 'hsl(150, 15%, 94%)',
+  muted: 'hsl(150, 10%, 92%)',
+  mutedForeground: 'hsl(150, 8%, 45%)',
+  destructive: 'hsl(0, 84%, 60%)',
+  warning: 'hsl(38, 92%, 50%)',
+  border: 'hsl(150, 10%, 90%)',
+  ring: 'hsl(142, 71%, 45%)',
+};
+
+export const darkColors = {
+  background: 'hsl(150, 30%, 4%)',
+  foreground: 'hsl(0, 0%, 96%)',
+  card: 'hsl(150, 15%, 8%)',
+  cardForeground: 'hsl(0, 0%, 96%)',
+  primary: 'hsl(142, 71%, 45%)',
+  primaryDark: 'hsl(142, 76%, 36%)',
+  primaryForeground: 'hsl(0, 0%, 100%)',
+  secondary: 'hsl(152, 60%, 52%)',
+  accent: 'hsl(150, 15%, 12%)',
+  muted: 'hsl(150, 10%, 12%)',
+  mutedForeground: 'hsl(150, 8%, 50%)',
+  destructive: 'hsl(0, 72%, 51%)',
+  warning: 'hsl(38, 92%, 50%)',
+  border: 'hsl(150, 10%, 15%)',
+  ring: 'hsl(142, 71%, 45%)',
+};
+
 export const Theme = {
-  colors: {
-    background: 'hsl(150, 30%, 4%)',
-    foreground: 'hsl(0, 0%, 96%)',
-    card: 'hsl(150, 15%, 8%)',
-    cardForeground: 'hsl(0, 0%, 96%)',
-    primary: 'hsl(142, 71%, 45%)',
-    primaryDark: 'hsl(142, 76%, 36%)',
-    primaryForeground: 'hsl(0, 0%, 100%)',
-    secondary: 'hsl(152, 60%, 52%)',
-    accent: 'hsl(150, 15%, 12%)',
-    muted: 'hsl(150, 10%, 12%)',
-    mutedForeground: 'hsl(150, 8%, 50%)',
-    destructive: 'hsl(0, 72%, 51%)',
-    warning: 'hsl(38, 92%, 50%)',
-    border: 'hsl(150, 10%, 15%)',
-    ring: 'hsl(142, 71%, 45%)',
-  },
+  colors: darkColors, // Default fallback
   typography: {
     displayXl: {
       fontFamily: 'System',

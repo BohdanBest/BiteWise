@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Flame, Scale, Dumbbell } from 'lucide-react-native';
+import { Flame, Scale, TrendingUp } from 'lucide-react-native';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import Button from '../../components/ui/Button';
 import OnboardingProgress from '../../components/ui/OnboardingProgress';
-
-type Goal = 'lose' | 'maintain' | 'gain';
+import { useRegistrationStore, Goal } from '../../store/useRegistrationStore';
 
 export default function OnboardingGoalScreen({ navigation }: any) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const updateData = useRegistrationStore((state) => state.updateData);
 
-  const handleCalculate = () => {
-    if (selectedGoal) {
-      console.log('Обрана ціль:', selectedGoal);
+  const handleNext = () => {
+    if (selectedGoal !== null) {
+      updateData({ goal: selectedGoal });
       navigation.navigate('OnboardingResult');
     }
   };
@@ -28,131 +31,177 @@ export default function OnboardingGoalScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Оберіть бажану ціль</Text>
         </View>
 
-        <View style={styles.cardsContainer}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Схуднення */}
           <TouchableOpacity 
-            style={[styles.card, selectedGoal === 'lose' && styles.cardActive]}
-            onPress={() => setSelectedGoal('lose')}
-            activeOpacity={0.8}
+            style={[
+              styles.optionCard, 
+              selectedGoal === Goal.LoseWeight && styles.optionCardSelected
+            ]}
+            onPress={() => setSelectedGoal(Goal.LoseWeight)}
+            activeOpacity={0.7}
           >
-            <View style={styles.iconContainer}>
-              <Flame size={32} color={selectedGoal === 'lose' ? Theme.colors.primary : Theme.colors.foreground} />
+            <View style={[styles.iconContainer, { backgroundColor: 'rgba(255, 149, 0, 0.1)' }]}>
+              <Flame size={24} color="#FF9500" />
             </View>
-            <View style={styles.cardTextContainer}>
-              <Text style={[styles.cardTitle, selectedGoal === 'lose' && styles.cardTitleActive]}>
-                Схуднення
-              </Text>
-              <Text style={styles.cardSubtitle}>-500 ккал/день</Text>
+            <View style={styles.optionTextContainer}>
+              <Text style={styles.optionTitle}>Схуднути</Text>
+              <Text style={styles.optionSubtitle}>Спалити жир та покращити форму</Text>
+            </View>
+            <View style={[
+              styles.radioCircle,
+              selectedGoal === Goal.LoseWeight && styles.radioCircleSelected
+            ]}>
+              {selectedGoal === Goal.LoseWeight && <View style={styles.radioInner} />}
             </View>
           </TouchableOpacity>
 
+          {/* Підтримка ваги */}
           <TouchableOpacity 
-            style={[styles.card, selectedGoal === 'maintain' && styles.cardActive]}
-            onPress={() => setSelectedGoal('maintain')}
-            activeOpacity={0.8}
+            style={[
+              styles.optionCard, 
+              selectedGoal === Goal.MaintainWeight && styles.optionCardSelected
+            ]}
+            onPress={() => setSelectedGoal(Goal.MaintainWeight)}
+            activeOpacity={0.7}
           >
-            <View style={styles.iconContainer}>
-              <Scale size={32} color={selectedGoal === 'maintain' ? Theme.colors.primary : Theme.colors.foreground} />
+            <View style={[styles.iconContainer, { backgroundColor: 'rgba(52, 199, 89, 0.1)' }]}>
+              <Scale size={24} color="#34C759" />
             </View>
-            <View style={styles.cardTextContainer}>
-              <Text style={[styles.cardTitle, selectedGoal === 'maintain' && styles.cardTitleActive]}>
-                Підтримка ваги
-              </Text>
-              <Text style={styles.cardSubtitle}>Баланс</Text>
+            <View style={styles.optionTextContainer}>
+              <Text style={styles.optionTitle}>Підтримувати вагу</Text>
+              <Text style={styles.optionSubtitle}>Залишатися у формі та бути здоровим</Text>
+            </View>
+            <View style={[
+              styles.radioCircle,
+              selectedGoal === Goal.MaintainWeight && styles.radioCircleSelected
+            ]}>
+              {selectedGoal === Goal.MaintainWeight && <View style={styles.radioInner} />}
             </View>
           </TouchableOpacity>
 
+          {/* Набір маси */}
           <TouchableOpacity 
-            style={[styles.card, selectedGoal === 'gain' && styles.cardActive]}
-            onPress={() => setSelectedGoal('gain')}
-            activeOpacity={0.8}
+            style={[
+              styles.optionCard, 
+              selectedGoal === Goal.GainWeight && styles.optionCardSelected
+            ]}
+            onPress={() => setSelectedGoal(Goal.GainWeight)}
+            activeOpacity={0.7}
           >
-            <View style={styles.iconContainer}>
-              <Dumbbell size={32} color={selectedGoal === 'gain' ? Theme.colors.primary : Theme.colors.foreground} />
+            <View style={[styles.iconContainer, { backgroundColor: 'rgba(0, 122, 255, 0.1)' }]}>
+              <TrendingUp size={24} color="#007AFF" />
             </View>
-            <View style={styles.cardTextContainer}>
-              <Text style={[styles.cardTitle, selectedGoal === 'gain' && styles.cardTitleActive]}>
-                Набір маси
-              </Text>
-              <Text style={styles.cardSubtitle}>+400 ккал/день</Text>
+            <View style={styles.optionTextContainer}>
+              <Text style={styles.optionTitle}>Набрати масу</Text>
+              <Text style={styles.optionSubtitle}>Збільшити вагу та м'язову масу</Text>
+            </View>
+            <View style={[
+              styles.radioCircle,
+              selectedGoal === Goal.GainWeight && styles.radioCircleSelected
+            ]}>
+              {selectedGoal === Goal.GainWeight && <View style={styles.radioInner} />}
             </View>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
 
         <View style={styles.spacer} />
 
         <Button 
           title="Розрахувати" 
-          onPress={handleCalculate} 
-          variant={selectedGoal ? 'primary' : 'secondary'}
+          onPress={handleNext}
+          variant={selectedGoal !== null ? 'primary' : 'secondary'}
         />
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
-    paddingHorizontal: Theme.spacing.pageHorizontal,
-    paddingTop: Theme.spacing.l,
-    paddingBottom: Theme.spacing.pageHorizontal,
+    paddingHorizontal: theme.spacing.pageHorizontal,
+    paddingTop: theme.spacing.l,
+    paddingBottom: theme.spacing.pageHorizontal,
   },
   header: {
     marginBottom: 40,
   },
   title: {
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 32,
-    color: Theme.colors.foreground,
-    marginBottom: Theme.spacing.xs,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    ...Theme.typography.body,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
   },
-  cardsContainer: {
+  optionsContainer: {
     flexDirection: 'column',
     gap: 16,
   },
-  card: {
+  optionCard: {
     flexDirection: 'row',
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
     borderWidth: 2,
     borderColor: 'transparent',
     alignItems: 'center',
-    padding: Theme.spacing.l,
+    padding: theme.spacing.l,
+    marginBottom: theme.spacing.m,
   },
-  cardActive: {
-    borderColor: Theme.colors.primary,
-    backgroundColor: Theme.colors.background,
-    ...Theme.shadows.glowPrimary,
+  optionCardSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.background,
+    ...theme.shadows.glowPrimary,
   },
   iconContainer: {
-    marginRight: Theme.spacing.l,
-    width: 40,
+    marginRight: theme.spacing.l,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cardTextContainer: {
+  optionTextContainer: {
     flex: 1,
   },
-  cardTitle: {
-    fontFamily: Theme.typography.h3.fontFamily,
+  optionTitle: {
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 18,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     marginBottom: 4,
   },
-  cardTitleActive: {
-    color: Theme.colors.primary,
+  optionSubtitle: {
+    ...theme.typography.caption,
+    color: theme.colors.mutedForeground,
   },
-  cardSubtitle: {
-    ...Theme.typography.caption,
-    color: Theme.colors.mutedForeground,
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: theme.spacing.m,
+  },
+  radioCircleSelected: {
+    borderColor: theme.colors.primary,
+  },
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: theme.colors.primary,
   },
   spacer: {
     flex: 1,

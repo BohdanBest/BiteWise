@@ -64,5 +64,17 @@ namespace BiteWise.BLL.Services
             // Повертаємо оновлений профіль
             return await GetProfileAsync(userId);
         }
+
+        public async Task DeleteAccountAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("Користувача не знайдено.");
+            }
+
+            await _userRepository.DeleteAsync(user);
+            await _userRepository.SaveChangesAsync();
+        }
     }
 }

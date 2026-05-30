@@ -24,6 +24,20 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilter>();
 });
 
+// Налаштовуємо CORS (безпечний підхід для продакшену)
+var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Дозволяємо передачу кукіс/токенів
+    });
+});
+
 // Вимикаємо стандартну обробку помилок валідації, щоб працював наш фільтр
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -135,6 +149,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("FrontendPolicy");
 
 // Важливо: Authentication має бути ПЕРЕД Authorization
 app.UseAuthentication();

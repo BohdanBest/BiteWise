@@ -51,12 +51,18 @@ namespace BiteWise.API.Controllers
         }
 
         [HttpGet("summary/{date}")]
-        public async Task<IActionResult> GetDailySummary(DateTime date)
+        public async Task<IActionResult> GetDailySummary(string date)
         {
             try
             {
+                if (!DateTime.TryParse(date, out DateTime parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid date format." });
+                }
+
+                var utcDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
                 var userId = GetUserId();
-                var summary = await _diaryService.GetDailySummaryAsync(userId, date);
+                var summary = await _diaryService.GetDailySummaryAsync(userId, utcDate);
                 
                 return Ok(summary);
             }
@@ -67,14 +73,35 @@ namespace BiteWise.API.Controllers
         }
 
         [HttpGet("statistics/weekly/{endDate}")]
-        public async Task<IActionResult> GetWeeklyStatistics(DateTime endDate)
+        public async Task<IActionResult> GetWeeklyStatistics(string endDate)
+        {
+            try
+            {
+                if (!DateTime.TryParse(endDate, out DateTime parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid date format." });
+                }
+
+                var utcDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                var userId = GetUserId();
+                var stats = await _diaryService.GetWeeklyStatisticsAsync(userId, utcDate);
+                
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{entryId}")]
+        public async Task<IActionResult> DeleteFoodEntry(Guid entryId)
         {
             try
             {
                 var userId = GetUserId();
-                var stats = await _diaryService.GetWeeklyStatisticsAsync(userId, endDate);
-                
-                return Ok(stats);
+                await _diaryService.RemoveEntryAsync(userId, entryId);
+                return Ok(new { message = "Запис успішно видалено." });
             }
             catch (Exception ex)
             {

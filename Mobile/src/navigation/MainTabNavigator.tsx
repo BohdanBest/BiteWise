@@ -2,14 +2,16 @@ import React from "react";
 import {
   View,
   TouchableOpacity,
-  StyleSheet,
   Platform,
+  StyleSheet,
   Text,
+  Animated,
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home, Book, Camera, BarChart2, User } from "lucide-react-native";
 import { BlurView } from "expo-blur";
 import { Theme } from "../constants/theme";
+import { useTheme, useStyles } from "../hooks/useTheme";
 
 import HomeScreen from "../screens/Main/HomeScreen";
 import DiaryScreen from "../screens/Diary/DiaryScreen";
@@ -25,29 +27,43 @@ const TabIcon = ({
 }: {
   focused: boolean;
   IconComponent: any;
-}) => (
+}) => {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+  
+  return (
   <View style={styles.iconContainer}>
     {focused && <View style={styles.activeIndicator} />}
     <IconComponent
       size={24}
-      color={focused ? Theme.colors.primary : Theme.colors.mutedForeground}
+      color={focused ? theme.colors.primary : theme.colors.mutedForeground}
     />
   </View>
-);
+  );
+};
 
-const CustomScanButton = ({ children, onPress }: any) => (
+const CustomScanButton = ({ onPress }: any) => {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+
+  return (
   <TouchableOpacity
     style={styles.scanButtonWrapper}
     onPress={onPress}
-    activeOpacity={0.9}>
+    activeOpacity={0.9}
+  >
     <View style={styles.scanButton}>
-      <Camera size={28} color={Theme.colors.primaryForeground} />
+      <Camera size={28} color={theme.colors.primaryForeground} />
     </View>
     <Text style={styles.scanButtonLabel}>СКАН</Text>
   </TouchableOpacity>
-);
+  );
+};
 
 export default function MainTabNavigator() {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -56,25 +72,26 @@ export default function MainTabNavigator() {
         tabBarBackground: () => (
           <View style={styles.blurContainer}>
             <BlurView
-              tint="dark"
+              tint={theme.isDark ? "dark" : "light"}
               intensity={80}
               style={StyleSheet.absoluteFill}
             />
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: "rgba(21, 30, 26, 0.65)" },
+                { backgroundColor: theme.isDark ? "rgba(21, 30, 26, 0.65)" : "rgba(255, 255, 255, 0.3)" },
               ]}
             />
           </View>
         ),
-        tabBarActiveTintColor: Theme.colors.primary,
-        tabBarInactiveTintColor: Theme.colors.mutedForeground,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.mutedForeground,
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarItemStyle: {
           backgroundColor: "transparent",
         },
-      }}>
+      }}
+    >
       <Tab.Screen
         name="HomeTab"
         component={HomeScreen}
@@ -128,7 +145,7 @@ export default function MainTabNavigator() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   tabBar: {
     position: "absolute",
     bottom: 24,
@@ -147,10 +164,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
+    borderColor: theme.isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)",
   },
   tabBarLabel: {
-    fontFamily: Theme.typography.caption.fontFamily,
+    fontFamily: theme.typography.caption.fontFamily,
     fontSize: 10,
     marginTop: 0,
     textTransform: "uppercase",
@@ -166,9 +183,9 @@ const styles = StyleSheet.create({
     top: -12, // Рівно по верхньому краю панелі
     width: 32,
     height: 3,
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     borderRadius: 2,
-    ...Theme.shadows.glowPrimary,
+    ...theme.shadows.glowPrimary,
   },
   scanButtonWrapper: {
     top: -20, // Трохи опустили, щоб текст не прилипав до низу
@@ -180,16 +197,16 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 22,
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 4,
-    ...Theme.shadows.glowPrimary,
+    ...theme.shadows.glowPrimary,
   },
   scanButtonLabel: {
-    fontFamily: Theme.typography.caption.fontFamily,
+    fontFamily: theme.typography.caption.fontFamily,
     fontSize: 10,
-    color: Theme.colors.primary,
+    color: theme.colors.primary,
     textTransform: "uppercase",
   },
 });

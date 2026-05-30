@@ -40,6 +40,17 @@ namespace BiteWise.DAL.Repositories
             await _context.FoodEntries.AddAsync(entry);
         }
 
+        public async Task<FoodEntry> GetByIdAsync(Guid id)
+        {
+            return await _context.FoodEntries.FindAsync(id);
+        }
+
+        public Task DeleteAsync(FoodEntry entry)
+        {
+            _context.FoodEntries.Remove(entry);
+            return Task.CompletedTask;
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

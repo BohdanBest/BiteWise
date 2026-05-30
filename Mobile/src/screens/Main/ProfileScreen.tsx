@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -19,13 +20,34 @@ import {
   LogOut,
 } from "lucide-react-native";
 import { Theme } from "../../constants/theme";
+import { useTheme, useStyles } from "../../hooks/useTheme";
 import mascotWave from "../../../assets/mascot-wave.png";
+import { useUserStore } from "../../store/useUserStore";
+import useAuthStore from "../../store/useAuthStore";
 
 export default function ProfileScreen() {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   const navigation = useNavigation<any>();
+  const { profile, isLoading } = useUserStore();
+  const logout = useAuthStore((state) => state.logout);
+
+  const getGoalText = (goal: string) => {
+    switch(goal) {
+      case 'lose': return 'Схуднення';
+      case 'maintain': return 'Підтримка ваги';
+      case 'gain': return 'Набір маси';
+      default: return 'Підтримка ваги';
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      {isLoading || !profile ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Завантаження профілю...</Text>
+        </View>
+      ) : (
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
@@ -33,18 +55,18 @@ export default function ProfileScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatarBox}>
-              <Image source={mascotWave} style={styles.avatarImage} />
+              <Image source={mascotWave} style={styles.avatarImage} resizeMode="contain" />
             </View>
             <View style={styles.zapBadge}>
               <Zap
                 size={14}
-                color={Theme.colors.primaryForeground}
-                fill={Theme.colors.primaryForeground}
+                color={theme.colors.primaryForeground}
+                fill={theme.colors.primaryForeground}
               />
             </View>
           </View>
-          <Text style={styles.userName}>Олександр</Text>
-          <Text style={styles.userEmail}>alex@example.com</Text>
+          <Text style={styles.userName}>{profile.name || 'Користувач'}</Text>
+          <Text style={styles.userEmail}>{profile.email || 'user@example.com'}</Text>
         </View>
 
         {/* Personal Data Card */}
@@ -54,26 +76,26 @@ export default function ProfileScreen() {
           <View style={styles.dataList}>
             <View style={styles.dataItem}>
               <View style={styles.iconBox}>
-                <Calendar size={18} color={Theme.colors.primary} />
+                <Calendar size={18} color={theme.colors.primary} />
               </View>
               <Text style={styles.dataLabel}>Вік</Text>
-              <Text style={styles.dataValue}>25 років</Text>
+              <Text style={styles.dataValue}>{profile.age} років</Text>
             </View>
 
             <View style={styles.dataItem}>
               <View style={styles.iconBox}>
-                <Weight size={18} color={Theme.colors.primary} />
+                <Weight size={18} color={theme.colors.primary} />
               </View>
               <Text style={styles.dataLabel}>Вага</Text>
-              <Text style={styles.dataValue}>75 кг</Text>
+              <Text style={styles.dataValue}>{profile.weightKg} кг</Text>
             </View>
 
             <View style={styles.dataItem}>
               <View style={styles.iconBox}>
-                <Ruler size={18} color={Theme.colors.primary} />
+                <Ruler size={18} color={theme.colors.primary} />
               </View>
               <Text style={styles.dataLabel}>Зріст</Text>
-              <Text style={styles.dataValue}>180 см</Text>
+              <Text style={styles.dataValue}>{profile.heightCm} см</Text>
             </View>
 
             <View
@@ -82,10 +104,10 @@ export default function ProfileScreen() {
                 { borderBottomWidth: 0, paddingBottom: 0, marginBottom: 0 },
               ]}>
               <View style={styles.iconBox}>
-                <Target size={18} color={Theme.colors.primary} />
+                <Target size={18} color={theme.colors.primary} />
               </View>
               <Text style={styles.dataLabel}>Ціль</Text>
-              <Text style={styles.dataValue}>Підтримка ваги</Text>
+              <Text style={styles.dataValue}>{profile.goalName || getGoalText(profile.goalName)}</Text>
             </View>
           </View>
         </View>
@@ -95,12 +117,12 @@ export default function ProfileScreen() {
           <Text style={styles.cardTitle}>Денна норма</Text>
 
           <View style={styles.normContainer}>
-            <Text style={styles.normValue}>2813</Text>
+            <Text style={styles.normValue}>{profile.dailyCalorieGoal}</Text>
             <Text style={styles.normUnit}>ккал/день</Text>
           </View>
 
           <Text style={styles.normFormula}>
-            ФОРМУЛА ХАРРІСА-БЕНЕДИКТА · КОЕФ. 1.55
+            {profile.formulaDetails || 'ФОРМУЛА ХАРРІСА-БЕНЕДИКТА · КОЕФ. 1.55'}
           </Text>
         </View>
 
@@ -108,58 +130,72 @@ export default function ProfileScreen() {
         <TouchableOpacity 
           style={styles.actionCard} 
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('Settings')}
+          onPress={() => {
+            if (Platform.OS === 'web' && typeof document !== 'undefined') {
+              (document.activeElement as HTMLElement)?.blur();
+            }
+            navigation.navigate('Settings');
+          }}
         >
-          <Settings size={20} color={Theme.colors.mutedForeground} />
+          <Settings size={20} color={theme.colors.mutedForeground} />
           <Text style={styles.actionText}>Налаштування</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionCard} activeOpacity={0.7}>
-          <LogOut size={20} color={Theme.colors.destructive} />
+        <TouchableOpacity style={styles.actionCard} activeOpacity={0.7} onPress={logout}>
+          <LogOut size={20} color={theme.colors.destructive} />
           <Text
-            style={[styles.actionText, { color: Theme.colors.destructive }]}>
+            style={[styles.actionText, { color: theme.colors.destructive }]}>
             Вийти з акаунту
           </Text>
         </TouchableOpacity>
       </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    paddingHorizontal: Theme.spacing.pageHorizontal,
-    paddingTop: Theme.spacing.xl,
+    paddingHorizontal: theme.spacing.pageHorizontal,
+    paddingTop: theme.spacing.xl,
     paddingBottom: 120, // Відступ для нижньої навігації
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
   },
 
   // Header
   headerContainer: {
     alignItems: "center",
-    marginBottom: Theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
   },
   avatarContainer: {
     position: "relative",
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   avatarBox: {
     width: 88,
     height: 88,
-    backgroundColor: Theme.colors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
   },
   avatarImage: {
     width: 80,
     height: 80,
-    resizeMode: "contain",
   },
   zapBadge: {
     position: "absolute",
@@ -167,39 +203,39 @@ const styles = StyleSheet.create({
     right: -4,
     width: 28,
     height: 28,
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: Theme.colors.background,
+    borderColor: theme.colors.background,
   },
   userName: {
-    fontFamily: Theme.typography.h2.fontFamily,
+    fontFamily: theme.typography.h2.fontFamily,
     fontSize: 22,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     marginBottom: 4,
   },
   userEmail: {
-    ...Theme.typography.body,
+    ...theme.typography.body,
     fontSize: 14,
-    color: Theme.colors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
 
   // Cards
   card: {
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.l,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.l,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
-    marginBottom: Theme.spacing.m,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.m,
   },
   cardTitle: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 16,
-    color: Theme.colors.foreground,
-    marginBottom: Theme.spacing.l,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.l,
   },
 
   // Data List
@@ -209,8 +245,8 @@ const styles = StyleSheet.create({
   dataItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: Theme.spacing.l,
-    paddingBottom: Theme.spacing.l,
+    marginBottom: theme.spacing.l,
+    paddingBottom: theme.spacing.l,
   },
   iconBox: {
     width: 36,
@@ -219,41 +255,41 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(21, 191, 99, 0.1)", // Прозорий зелений
     justifyContent: "center",
     alignItems: "center",
-    marginRight: Theme.spacing.m,
+    marginRight: theme.spacing.m,
     borderWidth: 1,
     borderColor: "rgba(21, 191, 99, 0.2)",
   },
   dataLabel: {
-    ...Theme.typography.body,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
     flex: 1,
   },
   dataValue: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 15,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
 
   // Norm
   normContainer: {
     flexDirection: "row",
     alignItems: "baseline",
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   normValue: {
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 42,
-    color: Theme.colors.primary,
+    color: theme.colors.primary,
     marginRight: 8,
   },
   normUnit: {
-    ...Theme.typography.body,
+    ...theme.typography.body,
     fontSize: 16,
-    color: Theme.colors.primary,
+    color: theme.colors.primary,
     opacity: 0.8,
   },
   normFormula: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 10,
     textTransform: "uppercase",
   },
@@ -262,17 +298,17 @@ const styles = StyleSheet.create({
   actionCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.l,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.l,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
-    marginBottom: Theme.spacing.s,
-    gap: Theme.spacing.m,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.s,
+    gap: theme.spacing.m,
   },
   actionText: {
-    ...Theme.typography.body,
+    ...theme.typography.body,
     fontSize: 16,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
 });

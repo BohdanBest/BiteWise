@@ -57,10 +57,10 @@ namespace BiteWise.API.Controllers
                 {
                     FoodName = nutrition.LocalizedName,
                     WeightGrams = mlResult.EstimatedWeightGrams,
-                    Calories = (int)Math.Round(nutrition.CaloriesPer100g * weightMultiplier),
-                    Proteins = (float)Math.Round(nutrition.ProteinsPer100g * weightMultiplier, 1),
-                    Fats = (float)Math.Round(nutrition.FatsPer100g * weightMultiplier, 1),
-                    Carbs = (float)Math.Round(nutrition.CarbsPer100g * weightMultiplier, 1),
+                    Calories = nutrition.CaloriesPer100g,
+                    Proteins = nutrition.ProteinsPer100g,
+                    Fats = nutrition.FatsPer100g,
+                    Carbs = nutrition.CarbsPer100g,
                     Confidence = mlResult.Confidence,
                     Warning = mlResult.Warning
                 };
@@ -73,10 +73,10 @@ namespace BiteWise.API.Controllers
                         finalResult.Alternatives.Add(new ScanAlternativeDto
                         {
                             FoodName = alt.LocalizedName,
-                            Calories = (int)Math.Round(alt.CaloriesPer100g * weightMultiplier),
-                            Proteins = (float)Math.Round(alt.ProteinsPer100g * weightMultiplier, 1),
-                            Fats = (float)Math.Round(alt.FatsPer100g * weightMultiplier, 1),
-                            Carbs = (float)Math.Round(alt.CarbsPer100g * weightMultiplier, 1)
+                            Calories = alt.CaloriesPer100g,
+                            Proteins = alt.ProteinsPer100g,
+                            Fats = alt.FatsPer100g,
+                            Carbs = alt.CarbsPer100g
                         });
                     }
                 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 
 interface GlassCardProps {
   children: React.ReactNode;
@@ -10,8 +11,10 @@ interface GlassCardProps {
 }
 
 export default function GlassCard({ children, style, intensity = 20 }: GlassCardProps) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   return (
-    <View style={[styles.container, Theme.shadows.premium, style]}>
+    <View style={[styles.container, theme.shadows.premium, style]}>
       <BlurView intensity={intensity} tint="dark" style={styles.blur}>
         <View style={styles.content}>
           {children}
@@ -21,9 +24,9 @@ export default function GlassCard({ children, style, intensity = 20 }: GlassCard
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
-    borderRadius: Theme.radius.lg,
+    borderRadius: theme.radius.lg,
     overflow: 'hidden', // Щоб BlurView не вилазив за краї
     backgroundColor: 'rgba(20, 24, 22, 0.4)', // fallback / base
   },
@@ -31,6 +34,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Theme.spacing.pageHorizontal,
+    padding: theme.spacing.pageHorizontal,
   }
 });

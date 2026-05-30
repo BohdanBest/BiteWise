@@ -63,5 +63,21 @@ namespace BiteWise.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteProfile()
+        {
+            try
+            {
+                var userId = GetUserId();
+                await _userService.DeleteAccountAsync(userId);
+                
+                return Ok(new { message = "Account successfully deleted." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

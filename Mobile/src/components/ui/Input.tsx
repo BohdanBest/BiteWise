@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TextInputProps, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, TextInput, Text, StyleSheet, TextInputProps, TouchableOpacity, Platform } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { Theme } from '../../constants/theme';
+import { useTheme, useStyles } from "../../hooks/useTheme";
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -11,8 +12,11 @@ interface InputProps extends TextInputProps {
 }
 
 export default function Input({ label, error, isPassword, suffix, style, onFocus, onBlur, ...props }: InputProps) {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const inputRef = useRef<TextInput>(null);
 
   return (
     <View style={styles.container}>
@@ -24,7 +28,8 @@ export default function Input({ label, error, isPassword, suffix, style, onFocus
         error && styles.inputError,
       ]}>
         <TextInput
-          placeholderTextColor={Theme.colors.mutedForeground}
+          ref={inputRef}
+          placeholderTextColor={theme.colors.mutedForeground}
           secureTextEntry={isPassword && !isPasswordVisible}
           style={[styles.input, style]}
           onFocus={(e) => {
@@ -45,15 +50,15 @@ export default function Input({ label, error, isPassword, suffix, style, onFocus
             activeOpacity={0.7}
           >
             {isPasswordVisible ? (
-              <EyeOff size={20} color={Theme.colors.mutedForeground} />
+              <EyeOff size={20} color={theme.colors.mutedForeground} />
             ) : (
-              <Eye size={20} color={Theme.colors.mutedForeground} />
+              <Eye size={20} color={theme.colors.mutedForeground} />
             )}
           </TouchableOpacity>
         )}
         
         {suffix && !isPassword && (
-          <View style={styles.suffixContainer}>
+          <View style={styles.suffixContainer} pointerEvents="none">
             <Text style={styles.suffixText}>{suffix}</Text>
           </View>
         )}
@@ -64,14 +69,14 @@ export default function Input({ label, error, isPassword, suffix, style, onFocus
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
-    marginBottom: Theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   label: {
-    ...Theme.typography.overline,
-    color: Theme.colors.mutedForeground,
-    marginBottom: Theme.spacing.xs,
+    ...theme.typography.overline,
+    color: theme.colors.mutedForeground,
+    marginBottom: theme.spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -79,43 +84,47 @@ const styles = StyleSheet.create({
     height: 56, // h-14
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Theme.colors.muted,
-    borderRadius: Theme.radius.md,
+    backgroundColor: theme.colors.muted,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
   },
   input: {
     flex: 1,
     height: '100%',
-    paddingHorizontal: Theme.spacing.l,
-    color: Theme.colors.foreground,
-    ...Theme.typography.bodyL,
-  },
+    paddingHorizontal: theme.spacing.l,
+    color: theme.colors.foreground,
+    ...theme.typography.bodyL,
+    ...Platform.select({
+      web: { outlineStyle: 'none' },
+      default: {},
+    }),
+  } as any,
   eyeIcon: {
-    paddingHorizontal: Theme.spacing.l,
+    paddingHorizontal: theme.spacing.l,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   suffixContainer: {
-    paddingRight: Theme.spacing.l,
+    paddingRight: theme.spacing.l,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   suffixText: {
-    ...Theme.typography.body,
-    color: Theme.colors.mutedForeground,
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
   },
   inputFocused: {
-    borderColor: Theme.colors.ring,
+    borderColor: theme.colors.ring,
   },
   inputError: {
-    borderColor: Theme.colors.destructive,
+    borderColor: theme.colors.destructive,
   },
   errorText: {
-    ...Theme.typography.caption,
-    color: Theme.colors.destructive,
-    marginTop: Theme.spacing.xs,
+    ...theme.typography.caption,
+    color: theme.colors.destructive,
+    marginTop: theme.spacing.xs,
   }
 });

@@ -40,5 +40,11 @@ namespace BiteWise.DAL.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public Task DeleteAsync(User user)
+        {
+            _context.Users.Remove(user);
+            return Task.CompletedTask;
+        }
     }
 }

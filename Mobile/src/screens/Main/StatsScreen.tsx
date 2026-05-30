@@ -1,31 +1,47 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, DimensionValue } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, DimensionValue, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../constants/theme';
-
-const CHART_DATA = [
-  { day: 'Пн', value: 2100 },
-  { day: 'Вт', value: 2400 },
-  { day: 'Ср', value: 1800 },
-  { day: 'Чт', value: 2500 },
-  { day: 'Пт', value: 2200 },
-  { day: 'Сб', value: 2600 },
-  { day: 'Нд', value: 1950 },
-];
-
-const TOP_MEALS = [
-  { name: 'Курка гриль', count: 12 },
-  { name: 'Вівсянка', count: 10 },
-  { name: 'Сирники', count: 8 },
-  { name: 'Грецький салат', count: 7 },
-  { name: 'Омлет', count: 5 },
-];
-
-const MAX_CHART_VALUE = 2600;
-const GOAL_VALUE = 2400;
+import { useTheme, useStyles } from "../../hooks/useTheme";
+import { useStatsStore } from '../../store/useStatsStore';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function StatsScreen() {
+  const theme = useTheme();
+  const styles = useStyles(createStyles);
+  const { stats, isLoading, fetchWeeklyStats } = useStatsStore();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchWeeklyStats();
+    }
+  }, [isFocused]);
+
+  if (isLoading || !stats) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]} edges={['top']}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
+  const GOAL_VALUE = stats.dailyCalorieGoal || 2000;
+  // Calculate max chart value dynamically: slightly above max calorie day, or the goal, whichever is higher
+  const maxCalorieValue = Math.max(stats.maxCalories.value, GOAL_VALUE);
+  // Add 15% padding to the top of the chart so bars don't touch the very top
+  const MAX_CHART_VALUE = maxCalorieValue > 0 ? Math.ceil(maxCalorieValue * 1.15 / 100) * 100 : 2500;
+
+  // Generate 5 Y-axis labels
+  const yLabels = [
+    MAX_CHART_VALUE,
+    Math.round(MAX_CHART_VALUE * 0.75),
+    Math.round(MAX_CHART_VALUE * 0.5),
+    Math.round(MAX_CHART_VALUE * 0.25),
+    0
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -43,11 +59,9 @@ export default function StatsScreen() {
           <View style={styles.chartContainer}>
             {/* Y-Axis Labels */}
             <View style={styles.yAxis}>
-              <Text style={styles.axisLabel}>2600</Text>
-              <Text style={styles.axisLabel}>1950</Text>
-              <Text style={styles.axisLabel}>1300</Text>
-              <Text style={styles.axisLabel}>650</Text>
-              <Text style={styles.axisLabel}>0</Text>
+              {yLabels.map((label, i) => (
+                <Text key={i} style={styles.axisLabel}>{label}</Text>
+              ))}
             </View>
 
             {/* Chart Area */}
@@ -66,17 +80,22 @@ export default function StatsScreen() {
                 
                 {/* Bars */}
                 <View style={styles.barsContainer}>
-                  {CHART_DATA.map((item, index) => {
-                    const heightPercent = `${(item.value / MAX_CHART_VALUE) * 100}%` as DimensionValue;
+                  {stats.dailyCalories.map((item, index) => {
+                    // Cap at 100% so bars don't break out of the container
+                    const rawPercent = (item.calories / MAX_CHART_VALUE) * 100;
+                    const heightPercent = `${Math.min(rawPercent, 100)}%` as DimensionValue;
+                    
                     return (
                       <View key={index} style={styles.barColumn}>
-                        <LinearGradient
-                          colors={[Theme.colors.primary, 'rgba(21, 191, 99, 0.05)']} // Плавний градієнт до прозорого
-                          style={[styles.bar, { height: heightPercent }]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 0, y: 1 }}
-                        />
-                        <Text style={styles.barLabel}>{item.day}</Text>
+                        {item.calories > 0 && (
+                          <LinearGradient
+                            colors={[theme.colors.primary, 'rgba(21, 191, 99, 0.05)']}
+                            style={[styles.bar, { height: heightPercent }]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                          />
+                        )}
+                        <Text style={styles.barLabel}>{item.dayOfWeek}</Text>
                       </View>
                     );
                   })}
@@ -92,7 +111,7 @@ export default function StatsScreen() {
               <Text style={styles.legendText}>КАЛОРІЇ</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={styles.legendDashedLine} />
+              <Text style={{ color: theme.colors.primary, fontWeight: 'bold', letterSpacing: 2, fontSize: 14 }}>---</Text>
               <Text style={styles.legendText}>ЦІЛЬ</Text>
             </View>
           </View>
@@ -101,16 +120,16 @@ export default function StatsScreen() {
         {/* Small Stats Row */}
         <View style={styles.statsRow}>
           <View style={styles.smallStatCard}>
-            <Text style={[styles.smallStatValue, { color: Theme.colors.primary }]}>2236</Text>
+            <Text style={[styles.smallStatValue, { color: theme.colors.primary }]}>{stats.averageCalories}</Text>
             <Text style={styles.smallStatLabel}>СЕРЕДНЄ</Text>
           </View>
           <View style={styles.smallStatCard}>
-            <Text style={styles.smallStatValue}>2600</Text>
-            <Text style={styles.smallStatLabel}>МАКС (СБ)</Text>
+            <Text style={styles.smallStatValue}>{stats.maxCalories.value}</Text>
+            <Text style={styles.smallStatLabel}>МАКС ({stats.maxCalories.dayOfWeek})</Text>
           </View>
           <View style={styles.smallStatCard}>
-            <Text style={styles.smallStatValue}>1900</Text>
-            <Text style={styles.smallStatLabel}>МІН (СР)</Text>
+            <Text style={styles.smallStatValue}>{stats.minCalories.value}</Text>
+            <Text style={styles.smallStatLabel}>МІН ({stats.minCalories.dayOfWeek})</Text>
           </View>
         </View>
 
@@ -119,17 +138,21 @@ export default function StatsScreen() {
           <Text style={styles.cardTitle}>Топ-5 страв</Text>
           
           <View style={styles.topMealsList}>
-            {TOP_MEALS.map((meal, index) => (
-              <View key={index} style={styles.topMealItem}>
-                <View style={styles.topMealLeft}>
-                  <View style={styles.topMealRank}>
-                    <Text style={styles.topMealRankText}>{index + 1}</Text>
+            {stats.topFoods.length === 0 ? (
+              <Text style={styles.emptyText}>Ще немає даних</Text>
+            ) : (
+              stats.topFoods.map((meal, index) => (
+                <View key={index} style={styles.topMealItem}>
+                  <View style={styles.topMealLeft}>
+                    <View style={styles.topMealRank}>
+                      <Text style={styles.topMealRankText}>{index + 1}</Text>
+                    </View>
+                    <Text style={styles.topMealName}>{meal.foodName}</Text>
                   </View>
-                  <Text style={styles.topMealName}>{meal.name}</Text>
+                  <Text style={styles.topMealCount}>{meal.count}×</Text>
                 </View>
-                <Text style={styles.topMealCount}>{meal.count}×</Text>
-              </View>
-            ))}
+              ))
+            )}
           </View>
         </View>
 
@@ -138,64 +161,64 @@ export default function StatsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    paddingHorizontal: Theme.spacing.pageHorizontal,
-    paddingTop: Theme.spacing.l,
+    paddingHorizontal: theme.spacing.pageHorizontal,
+    paddingTop: theme.spacing.l,
     paddingBottom: 120, // Відступ для нижньої навігації
   },
   header: {
-    marginBottom: Theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
   },
   headerTitle: {
-    fontFamily: Theme.typography.h1.fontFamily,
+    fontFamily: theme.typography.h1.fontFamily,
     fontSize: 28,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     marginBottom: 4,
   },
   headerSubtitle: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 12,
     textTransform: 'uppercase',
   },
   
   // Chart Card
   chartCard: {
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.l,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.l,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
-    marginBottom: Theme.spacing.m,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.m,
   },
   cardTitle: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 16,
-    color: Theme.colors.foreground,
-    marginBottom: Theme.spacing.l,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.l,
   },
   chartContainer: {
     flexDirection: 'row',
     height: 180,
-    marginBottom: Theme.spacing.l,
-    marginTop: Theme.spacing.s,
+    marginBottom: theme.spacing.l,
+    marginTop: theme.spacing.s,
   },
   yAxis: {
     justifyContent: 'space-between',
-    paddingRight: Theme.spacing.m,
+    paddingRight: theme.spacing.m,
     paddingBottom: 20, // To match the height of x-axis labels
     alignItems: 'flex-end',
     width: 40,
   },
   axisLabel: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 11,
-    color: Theme.colors.mutedForeground,
-    fontFamily: Theme.typography.tabularNums.fontFamily,
+    color: theme.colors.mutedForeground,
+    fontFamily: theme.typography.tabularNums.fontFamily,
   },
   barsArea: {
     flex: 1,
@@ -210,7 +233,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
     opacity: 0.3,
     zIndex: 1,
@@ -220,7 +243,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: 1,
-    borderColor: Theme.colors.primary,
+    borderColor: theme.colors.primary,
     borderStyle: 'dashed',
     opacity: 0.8,
     zIndex: 2,
@@ -244,19 +267,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 6,
   },
   barLabel: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 11,
     position: 'absolute',
     bottom: -20,
-    color: Theme.colors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
   
   // Legend
   legendContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: Theme.spacing.s,
-    gap: Theme.spacing.l,
+    marginTop: theme.spacing.s,
+    gap: theme.spacing.l,
   },
   legendItem: {
     flexDirection: 'row',
@@ -264,20 +287,20 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   legendColorBox: {
-    width: 12,
-    height: 12,
-    backgroundColor: Theme.colors.primary,
-    borderRadius: 2,
+    width: 14,
+    height: 14,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 4,
   },
   legendDashedLine: {
     width: 16,
-    borderTopWidth: 1.5,
+    borderTopWidth: 2,
     borderStyle: 'dashed',
-    borderColor: Theme.colors.primary,
+    borderColor: theme.colors.primary,
     opacity: 0.8,
   },
   legendText: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 10,
     textTransform: 'uppercase',
   },
@@ -286,41 +309,41 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: Theme.spacing.m,
-    marginBottom: Theme.spacing.m,
+    gap: theme.spacing.m,
+    marginBottom: theme.spacing.m,
   },
   smallStatCard: {
     flex: 1,
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.m,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.m,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   smallStatValue: {
-    fontFamily: Theme.typography.h2.fontFamily,
+    fontFamily: theme.typography.h2.fontFamily,
     fontSize: 20,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
     marginBottom: 4,
   },
   smallStatLabel: {
-    ...Theme.typography.caption,
+    ...theme.typography.caption,
     fontSize: 10,
     textTransform: 'uppercase',
   },
 
   // Top Meals Card
   topMealsCard: {
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.l,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.l,
     borderWidth: 1,
-    borderColor: Theme.colors.border,
+    borderColor: theme.colors.border,
   },
   topMealsList: {
-    gap: Theme.spacing.m,
+    gap: theme.spacing.m,
   },
   topMealItem: {
     flexDirection: 'row',
@@ -330,29 +353,34 @@ const styles = StyleSheet.create({
   topMealLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Theme.spacing.m,
+    gap: theme.spacing.m,
   },
   topMealRank: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   topMealRankText: {
-    fontFamily: Theme.typography.h3.fontFamily,
+    fontFamily: theme.typography.h3.fontFamily,
     fontSize: 12,
-    color: Theme.colors.primaryForeground,
+    color: theme.colors.primaryForeground,
   },
   topMealName: {
-    ...Theme.typography.body,
+    ...theme.typography.body,
     fontSize: 15,
-    color: Theme.colors.foreground,
+    color: theme.colors.foreground,
   },
   topMealCount: {
-    fontFamily: Theme.typography.tabularNums.fontFamily,
+    fontFamily: theme.typography.tabularNums.fontFamily,
     fontSize: 13,
-    color: Theme.colors.mutedForeground,
+    color: theme.colors.mutedForeground,
+  },
+  emptyText: {
+    ...theme.typography.body,
+    color: theme.colors.mutedForeground,
+    fontStyle: 'italic',
   }
 });

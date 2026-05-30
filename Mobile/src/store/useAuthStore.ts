@@ -1,37 +1,73 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axiosClient from '../api/axiosClient';
+import { useUserStore } from './useUserStore';
 
 interface AuthState {
   token: string | null;
+  refreshToken: string | null;
   isLoading: boolean;
-  setToken: (token: string) => Promise<void>;
+  login: (data: any) => Promise<void>;
+  register: (data: any) => Promise<void>;
+  setTokens: (token: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
 
 const useAuthStore = create<AuthState>((set) => ({
   token: null,
+  refreshToken: null,
   isLoading: true, // Початково true, щоб показати Splash Screen під час перевірки
 
-  setToken: async (token: string) => {
-    await AsyncStorage.setItem('userToken', token);
-    set({ token, isLoading: false });
+  login: async (data: any) => {
+    const response = await axiosClient.post('/Auth/login', data);
+    const { token, refreshToken } = response.data;
+    await AsyncStorage.multiSet([
+      ['userToken', token],
+      ['refreshToken', refreshToken]
+    ]);
+    set({ token, refreshToken });
+    await useUserStore.getState().fetchProfile();
+  },
+
+  register: async (data: any) => {
+    const response = await axiosClient.post('/Auth/register', data);
+    const { token, refreshToken } = response.data;
+    await AsyncStorage.multiSet([
+      ['userToken', token],
+      ['refreshToken', refreshToken]
+    ]);
+    set({ token, refreshToken });
+    await useUserStore.getState().fetchProfile();
+  },
+
+  setTokens: async (token: string, refreshToken: string) => {
+    await AsyncStorage.multiSet([
+      ['userToken', token],
+      ['refreshToken', refreshToken]
+    ]);
+    set({ token, refreshToken, isLoading: false });
   },
 
   logout: async () => {
-    await AsyncStorage.removeItem('userToken');
-    set({ token: null, isLoading: false });
+    await AsyncStorage.multiRemove(['userToken', 'refreshToken']);
+    set({ token: null, refreshToken: null, isLoading: false });
+    useUserStore.getState().clearProfile();
   },
 
   checkAuth: async () => {
     try {
-      // Штучна затримка для показу Splash Screen (2.5 сек)
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const token = await AsyncStorage.getItem('userToken');
-      set({ token, isLoading: false });
+      const [[, token], [, refreshToken]] = await AsyncStorage.multiGet(['userToken', 'refreshToken']);
+      if (token && refreshToken) {
+        set({ token, refreshToken, isLoading: false });
+        await useUserStore.getState().fetchProfile();
+      } else {
+        set({ token: null, refreshToken: null, isLoading: false });
+      }
     } catch (e) {
-      set({ token: null, isLoading: false });
+      set({ token: null, refreshToken: null, isLoading: false });
     }
   }
 }));
