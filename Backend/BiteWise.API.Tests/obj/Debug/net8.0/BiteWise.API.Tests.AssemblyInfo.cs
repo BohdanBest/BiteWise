@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BiteWise.API.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ed272572704e83e8e3de05ca6cdb421f1c1cbe3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fc235d92049d22035a1e0934168644f43ddc25a")]
 [assembly: System.Reflection.AssemblyProductAttribute("BiteWise.API.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BiteWise.API.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

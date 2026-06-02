@@ -143,6 +143,13 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Автоматичне застосування міграцій бази даних при запуску
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

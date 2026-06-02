@@ -40,7 +40,7 @@ axiosClient.interceptors.response.use(
         
         if (token && refreshToken) {
           // Робимо запит напряму через axios, щоб уникнути нескінченного циклу інтерсепторів axiosClient
-          const response = await axios.post(`${API_BASE_URL}/Auth/refresh`, {
+          const response = await axios.post(`${API_BASE_URL}/Auth/refresh-token`, {
             accessToken: token,
             refreshToken: refreshToken
           });
