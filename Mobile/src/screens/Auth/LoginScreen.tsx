@@ -42,7 +42,7 @@ export default function LoginScreen({ navigation }: any) {
       >
         <View style={styles.header}>
           <Image source={mascot} style={styles.mascot} resizeMode="contain" />
-          <Text style={styles.title}>NutriScan</Text>
+          <Text style={styles.title}>BiteWise</Text>
           <Text style={styles.subtitle}>Розпізнавай їжу, контролюй калорії</Text>
         </View>
 

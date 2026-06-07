@@ -13,18 +13,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-// Load .env file (TraversePath шукає файл .env у поточній та всіх батьківських папках)
 DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Додаємо контролери та фільтри
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
 });
 
-// Налаштовуємо CORS (безпечний підхід для продакшену)
 var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
 builder.Services.AddCors(options =>
@@ -34,34 +31,28 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials(); // Дозволяємо передачу кукіс/токенів
+              .AllowCredentials();
     });
 });
 
-// Вимикаємо стандартну обробку помилок валідації, щоб працював наш фільтр
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
 
-// 2. Підключаємо базу даних PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Додаємо Redis (Distributed Cache)
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
     options.InstanceName = "BiteWise_";
 });
 
-// 3. Реєстрація залежностей (Dependency Injection)
-// Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFoodEntryRepository, FoodEntryRepository>();
 
-// Add Services
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDiaryService, DiaryService>();
@@ -73,7 +64,6 @@ builder.Services.AddScoped<IAchievementService, AchievementService>();
 builder.Services.AddScoped<IBarcodeService, BarcodeService>();
 builder.Services.AddHttpClient<IMLServiceClient, MLServiceClient>();
 
-// Реєстрація AutoMapper та FluentValidation
 builder.Services.AddAutoMapper(cfg => 
 {
     cfg.AddProfile<BiteWise.BLL.Mappings.MappingProfile>();
@@ -81,9 +71,7 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
-// 4. Налаштування JWT Авторизації
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-// Отримуємо секретний ключ з .env (перевизначає appsettings.json)
 var jwtKeyString = Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"];
 
 if (string.IsNullOrEmpty(jwtKeyString))
@@ -111,7 +99,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -143,14 +130,15 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Автоматичне застосування міграцій бази даних при запуску
-using (var scope = app.Services.CreateScope())
+if (app.Environment.EnvironmentName != "Testing")
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+    }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -161,7 +149,6 @@ app.UseHttpsRedirection();
 
 app.UseCors("FrontendPolicy");
 
-// Важливо: Authentication має бути ПЕРЕД Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Switch,
   Modal,
   ActivityIndicator,
+  LogBox,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -29,6 +30,9 @@ import { Theme } from "../../constants/theme";
 import { useTheme, useStyles } from "../../hooks/useTheme";
 import { useThemeStore } from "../../store/useThemeStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
+
+// Ігноруємо попередження від зовнішньої бібліотеки
+LogBox.ignoreLogs(['DateTimePicker: `onChange` is deprecated']);
 
 export default function SettingsScreen() {
   const navigation = useNavigation<any>();
@@ -233,6 +237,9 @@ export default function SettingsScreen() {
         onCancel={hideDatePicker}
         confirmTextIOS="Зберегти"
         cancelTextIOS="Скасувати"
+        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+        themeVariant={mode === 'dark' ? 'dark' : 'light'}
+        isDarkModeEnabled={mode === 'dark'}
       />
 
       {/* Delete Confirmation Modal */}

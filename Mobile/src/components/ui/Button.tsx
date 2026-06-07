@@ -9,11 +9,12 @@ interface ButtonProps {
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'ghost';
   isLoading?: boolean;
+  disabled?: boolean;
   rightIcon?: React.ReactNode;
   style?: ViewStyle;
 }
 
-export default function Button({ title, onPress, variant = 'primary', isLoading, rightIcon, style }: ButtonProps) {
+export default function Button({ title, onPress, variant = 'primary', isLoading, disabled, rightIcon, style }: ButtonProps) {
   const theme = useTheme();
   const styles = useStyles(createStyles);
   const isPrimary = variant === 'primary';
@@ -63,9 +64,9 @@ export default function Button({ title, onPress, variant = 'primary', isLoading,
           onPress={onPress} 
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
-          disabled={isLoading} 
+          disabled={isLoading || disabled} 
           activeOpacity={0.8} 
-          style={style}
+          style={[style, disabled && { opacity: 0.6 }]}
         >
           <LinearGradient
             colors={[theme.colors.primary, theme.colors.secondary]}
@@ -83,13 +84,14 @@ export default function Button({ title, onPress, variant = 'primary', isLoading,
   return (
     <TouchableOpacity 
       onPress={onPress} 
-      disabled={isLoading}
+      disabled={isLoading || disabled}
       activeOpacity={0.7}
       style={[
         styles.base,
         isSecondary && styles.secondary,
         variant === 'ghost' && styles.ghost,
-        style
+        style,
+        disabled && { opacity: 0.6 }
       ]}
     >
       {content}

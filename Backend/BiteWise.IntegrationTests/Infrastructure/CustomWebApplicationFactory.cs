@@ -20,9 +20,10 @@ namespace BiteWise.IntegrationTests.Infrastructure
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("Testing");
+
             builder.ConfigureServices(services =>
             {
-                // Крок 1 — видалити реальну реєстрацію DbContext
                 var descriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
 
@@ -31,11 +32,9 @@ namespace BiteWise.IntegrationTests.Infrastructure
                     services.Remove(descriptor);
                 }
 
-                // Крок 2 — зареєструвати SQLite in-memory DbContext
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlite(_connection));
 
-                // Крок 3 — ініціалізувати схему БД
                 var sp = services.BuildServiceProvider();
                 using var scope = sp.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

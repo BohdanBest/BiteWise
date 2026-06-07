@@ -4,7 +4,8 @@ import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -13,21 +14,35 @@ Notifications.setNotificationHandler({
 export class NotificationService {
   static async requestPermissions(): Promise<boolean> {
     if (Platform.OS === 'web') return false;
-    
-    if (!Device.isDevice) {
-      console.log('Must use physical device for Push Notifications');
-      return false;
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#22C55E',
+      });
     }
 
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+        },
+      });
       finalStatus = status;
     }
     
-    return finalStatus === 'granted';
+    if (finalStatus !== 'granted') {
+      console.log('Notification permissions not granted!');
+      return false;
+    }
+    return true;
   }
 
   static async scheduleMealReminders(enabled: boolean, mealTimes: { breakfast: string, lunch: string, dinner: string }) {
@@ -39,7 +54,10 @@ export class NotificationService {
     if (!enabled) return;
 
     const hasPermission = await this.requestPermissions();
-    if (!hasPermission) return;
+    if (!hasPermission) {
+      alert('Увімкніть дозволи на сповіщення в налаштуваннях телефону, щоб отримувати нагадування.');
+      return;
+    }
 
     // Schedule new ones
     await this.scheduleDailyReminder('breakfast', mealTimes.breakfast, 'Сніданок 🍳', 'Час для смачного і корисного сніданку!');

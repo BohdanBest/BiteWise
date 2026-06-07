@@ -82,8 +82,8 @@ export default function SplashScreen({ isReady, onFinish }: SplashProps) {
 
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }], alignItems: 'center' }}>
           <View style={styles.logoContainer}>
-            <Text style={[styles.logoText, { color: theme.colors.primary }]}>Nutri</Text>
-            <Text style={[styles.logoText, { color: theme.colors.foreground }]}>Scan</Text>
+            <Text style={[styles.logoText, { color: theme.colors.primary }]}>Bite</Text>
+            <Text style={[styles.logoText, { color: theme.colors.foreground }]}>Wise</Text>
           </View>
           <Text style={styles.subtitle}>SMART NUTRITION TRACKING</Text>
         </Animated.View>
